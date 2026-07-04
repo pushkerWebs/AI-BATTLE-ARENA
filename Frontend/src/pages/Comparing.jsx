@@ -7,6 +7,7 @@ import { C } from '../constants/colors'
 
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { API_BASE } from '../config'
 
 const STEPS = [
   { id: 'step-1', icon: 'memory',     label: 'Generating Solution 1...', duration: 2500 },
@@ -97,7 +98,7 @@ export default function Comparing({ problem, model1, model2, judgeModel, onDone,
       headers['Authorization'] = `Bearer ${token}`
     }
 
-    fetch('http://localhost:3000/battle', {
+    fetch(`${API_BASE}/battle`, {
       method: 'POST',
       headers,
       body: JSON.stringify({ problem, model1, model2, judgeModel }),

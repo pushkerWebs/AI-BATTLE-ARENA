@@ -5,6 +5,7 @@ import Icon from '../components/Icon'
 import { C } from '../constants/colors'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
+import { API_BASE } from '../config'
 
 // ─── Formatting helpers ──────────────────────────────────────────────────────
 function formatDate(dStr) {
@@ -51,7 +52,7 @@ export default function History({ onNavigate, onSelectBattle }) {
       return
     }
 
-    fetch('http://localhost:3000/auth/history', {
+    fetch(`${API_BASE}/auth/history`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then((res) => {

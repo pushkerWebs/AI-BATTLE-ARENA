@@ -3,7 +3,7 @@ import { motion, useInView, AnimatePresence } from 'framer-motion'
 import './App.css'
 import { C } from '../constants/colors'
 
-const API_URL = 'http://localhost:3000'
+import { API_BASE as API_URL } from '../config'
 
 // ─── Animation variants ───────────────────────────────────────────────────────
 const fadeUp = {

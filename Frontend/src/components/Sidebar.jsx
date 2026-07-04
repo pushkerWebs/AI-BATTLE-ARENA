@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import Icon from './Icon'
 import { C } from '../constants/colors'
 import { useAuth } from '../context/AuthContext'
+import { API_BASE } from '../config'
 
 const NAV_ITEMS = [
   { key: 'home',     icon: 'add_box',     label: 'New Comparison' },
@@ -24,7 +25,7 @@ export default function Sidebar({ activeKey = 'home', onNav, onSelectBattle }) {
   useEffect(() => {
     if (!token) return
 
-    fetch('http://localhost:3000/auth/history', {
+    fetch(`${API_BASE}/auth/history`, {
       headers: { Authorization: `Bearer ${token}` },
     })
       .then(res => {
