@@ -5,7 +5,7 @@ import { API_BASE } from '../config'
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {
-  const [user, setUser]   = useState(null)
+  const [user, setUser] = useState(null)
   const [token, setToken] = useState(() => localStorage.getItem('arena_token') || null)
   const [loading, setLoading] = useState(true)
 
@@ -69,6 +69,38 @@ export function AuthProvider({ children }) {
     return data
   }, [])
 
+  // ── Google Login ───────────────────────────────────────────────────────────
+  const googleLogin = useCallback(async (credential) => {
+    const res = await fetch(`${API_BASE}/auth/google`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ credential }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Google Login failed')
+    localStorage.setItem('arena_token', data.token)
+    setToken(data.token)
+    setUser(data.user)
+    return data
+  }, [])
+
+  // ── Update Avatar ──────────────────────────────────────────────────────────
+  const updateAvatar = useCallback(async (avatarUrlOrSeed) => {
+    if (!token) return
+    const res = await fetch(`${API_BASE}/auth/avatar`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify({ avatar: avatarUrlOrSeed }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Failed to update avatar')
+    setUser(data.user)
+    return data.user
+  }, [token])
+
   // ── Logout ──────────────────────────────────────────────────────────────────
   const logout = useCallback(() => {
     localStorage.removeItem('arena_token')
@@ -77,7 +109,7 @@ export function AuthProvider({ children }) {
   }, [])
 
   return (
-    <AuthContext.Provider value={{ user, token, loading, register, login: loginFn, logout }}>
+    <AuthContext.Provider value={{ user, token, loading, register, login: loginFn, logout, updateAvatar, googleLogin }}>
       {children}
     </AuthContext.Provider>
   )

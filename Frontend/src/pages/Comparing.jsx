@@ -217,7 +217,7 @@ export default function Comparing({ problem, model1, model2, judgeModel, onDone,
           <div style={{
             position: 'relative',
             width: 112, height: 112, borderRadius: '50%',
-            border: `1px solid ${C.primary}1a`,
+            border: '1px solid var(--color-primary-glow, #a855f7)22',
             background: C.surfLow2,
             display: 'flex', alignItems: 'center', justifyContent: 'center',
             overflow: 'hidden',
@@ -225,11 +225,11 @@ export default function Comparing({ problem, model1, model2, judgeModel, onDone,
           }}>
             <div style={{
               position: 'absolute', inset: '0 0 50% 0',
-              background: `linear-gradient(to bottom, transparent, ${C.primary}30, transparent)`,
+              background: 'linear-gradient(to bottom, transparent, var(--color-primary-glow, #a855f7)30, transparent)',
               animation: 'scanning 2s linear infinite',
             }} />
-            <Icon n="gavel" fill size={48} style={{ color: C.primary, position: 'relative', zIndex: 1, animation: 'subtle-pulse 4s ease-in-out infinite' }} />
-            <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: `2px solid ${C.primary}0d`, animation: 'ping-anim 2s ease-in-out infinite' }} />
+            <Icon n="gavel" fill size={48} className="anim-hammer" style={{ color: 'var(--color-primary-glow, #a855f7)', position: 'relative', zIndex: 1 }} />
+            <div style={{ position: 'absolute', inset: 0, borderRadius: '50%', border: '2px solid var(--color-primary-glow, #a855f7)0d', animation: 'ping-anim 2s ease-in-out infinite' }} />
           </div>
 
           {/* Step cards */}

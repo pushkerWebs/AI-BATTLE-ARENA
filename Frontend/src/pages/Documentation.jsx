@@ -1,4 +1,4 @@
-import { motion } from 'framer-motion'
+import { motion, useReducedMotion } from 'framer-motion'
 import ShaderBg from '../components/ShaderBg'
 import Icon from '../components/Icon'
 import { C } from '../constants/colors'
@@ -7,6 +7,7 @@ import { useTheme } from '../context/ThemeContext'
 // ─── Stacked Card Component ──────────────────────────────────────────────────
 function StackedCard({ step, title, desc, index, total, children }) {
   const topOffset = 100 + index * 40
+  const shouldReduceMotion = useReducedMotion()
 
   return (
     <div
@@ -18,7 +19,7 @@ function StackedCard({ step, title, desc, index, total, children }) {
       }}
     >
       <motion.div
-        initial={{ opacity: 0, y: 60, scale: 0.98 }}
+        initial={shouldReduceMotion ? { opacity: 1, y: 0, scale: 1 } : { opacity: 0, y: 12, scale: 0.99 }}
         whileInView={{ opacity: 1, y: 0, scale: 1 }}
         viewport={{ once: true, margin: "-80px" }}
         transition={{ duration: 0.6, ease: [0.25, 0.46, 0.45, 0.94] }}
@@ -118,6 +119,8 @@ function StackedCard({ step, title, desc, index, total, children }) {
 // ─── Documentation Page ───────────────────────────────────────────────────────
 export default function Documentation({ onNavigate }) {
   const { theme, toggleTheme } = useTheme()
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <div style={{ display: 'flex', width: '100%', minHeight: '100vh', background: C.bg, color: C.onSurf, position: 'relative' }}>
 
@@ -132,7 +135,7 @@ export default function Documentation({ onNavigate }) {
 
         {/* Header */}
         <motion.header
-          initial={{ y: -16, opacity: 0 }}
+          initial={shouldReduceMotion ? { y: 0, opacity: 1 } : { y: -12, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.45 }}
           style={{
@@ -149,7 +152,7 @@ export default function Documentation({ onNavigate }) {
           }}
         >
           <motion.div
-            whileHover={{ opacity: 0.8 }}
+            whileHover={shouldReduceMotion ? {} : { opacity: 0.8 }}
             style={{ display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer' }}
             onClick={() => onNavigate('home')}
           >
@@ -162,8 +165,8 @@ export default function Documentation({ onNavigate }) {
             {/* Theme toggle */}
             <motion.button
               onClick={toggleTheme}
-              whileHover={{ scale: 1.1 }}
-              whileTap={{ scale: 0.9 }}
+              whileHover={shouldReduceMotion ? {} : { scale: 1.02 }}
+              whileTap={shouldReduceMotion ? {} : { scale: 0.985 }}
               title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
               style={{
                 background: 'transparent',

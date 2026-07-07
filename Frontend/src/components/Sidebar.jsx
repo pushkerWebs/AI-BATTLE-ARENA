@@ -5,11 +5,11 @@ import { useAuth } from '../context/AuthContext'
 import { API_BASE } from '../config'
 
 const NAV_ITEMS = [
-  { key: 'home',     icon: 'add_box',     label: 'New Comparison' },
-  { key: 'history',  icon: 'history',     label: 'History'        },
-  { key: 'prompts',  icon: 'chat_bubble', label: 'Recent Prompts' },
-  { key: 'fav',      icon: 'star',        label: 'Favorites'      },
-  { key: 'settings', icon: 'settings',    label: 'Settings'       },
+  { key: 'home', icon: 'add_box', label: 'New Comparison' },
+  { key: 'history', icon: 'history', label: 'History' },
+  { key: 'prompts', icon: 'chat_bubble', label: 'Recent Prompts' },
+  { key: 'fav', icon: 'star', label: 'Favorites' },
+  { key: 'settings', icon: 'settings', label: 'Settings' },
 ]
 
 export default function Sidebar({ activeKey = 'home', onNav, onSelectBattle }) {
@@ -59,7 +59,13 @@ export default function Sidebar({ activeKey = 'home', onNav, onSelectBattle }) {
     }}>
       {/* Logo */}
       <div style={{ marginBottom: 48 }}>
-        <h1 className="logo-brand" style={{ fontSize: 22, margin: 0 }}>AI ARENA</h1>
+        <h1
+          className="logo-brand"
+          onClick={() => onNav('home')}
+          style={{ fontSize: 22, margin: 0, cursor: 'pointer' }}
+        >
+          AI ARENA
+        </h1>
         <p style={{
           fontFamily: "'Geist Pixel', monospace",
           fontSize: 11, color: C.onSurfVar, opacity: 0.6, marginTop: 6, letterSpacing: '0.04em',
@@ -155,8 +161,8 @@ export default function Sidebar({ activeKey = 'home', onNav, onSelectBattle }) {
           transition: 'opacity 0.2s, transform 0.15s',
           display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
         }}
-        onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'scale(0.99)' }}
-        onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)' }}
+          onMouseEnter={e => { e.currentTarget.style.opacity = '0.9'; e.currentTarget.style.transform = 'scale(0.99)' }}
+          onMouseLeave={e => { e.currentTarget.style.opacity = '1'; e.currentTarget.style.transform = 'scale(1)' }}
         >
           Upgrade to Pro
         </button>

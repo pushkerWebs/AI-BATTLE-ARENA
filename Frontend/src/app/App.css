@@ -23,6 +23,7 @@
   --color-outline: #8e9192;
   --color-outline-v: #444748;
   --color-primary: #ffffff;
+  --color-primary-glow: #a855f7;
   --color-on-primary: #2f3131;
   --color-secondary: #b9c8de;
   --color-sec-cont: #39485a;
@@ -30,6 +31,9 @@
   --color-surface-glass: rgba(17, 17, 17, 0.7);
   --color-glow-shadow: rgba(255, 255, 255, 0.12);
   --color-winner-border: #ffffff;
+  --color-hero-title: #e5e2e1;
+  --color-hero-accent-text: inherit;
+  --color-hero-accent-primary: inherit;
 
   /* Markdown dark mode tokens */
   --md-text:         #e5e2e1;
@@ -59,6 +63,7 @@
   --color-outline: #727785;
   --color-outline-v: #c2c6d6;
   --color-primary: #0058be;
+  --color-primary-glow: #0058be;
   --color-on-primary: #ffffff;
   --color-secondary: #5f5e5e;
   --color-sec-cont: #e2dfde;
@@ -66,6 +71,9 @@
   --color-surface-glass: rgba(255, 255, 255, 0.8);
   --color-glow-shadow: rgba(0, 88, 190, 0.15);
   --color-winner-border: #0058be;
+  --color-hero-title: #000000;
+  --color-hero-accent-text: #000000;
+  --color-hero-accent-primary: #0058be;
 
   /* Markdown light mode tokens */
   --md-text:         #1e293b;
@@ -343,6 +351,16 @@ body {
 .anim-spin    { animation: spin-kf 1s linear infinite; }
 .anim-glow    { animation: glow-pulse 3s ease-in-out infinite; }
 .anim-float   { animation: float-y 3.5s ease-in-out infinite; }
+
+@keyframes hammer-swing {
+  0%, 100% { transform: rotate(-5deg); }
+  50% { transform: rotate(18deg); }
+}
+.anim-hammer {
+  animation: hammer-swing 1.5s ease-in-out infinite;
+  transform-origin: bottom right;
+  display: inline-block;
+}
 
 /* ─── Mobile nav — only visible on small screens ─────────── */
 @media (max-width: 767px) {

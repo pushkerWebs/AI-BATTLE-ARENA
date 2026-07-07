@@ -77,7 +77,7 @@ Make sure your responses are extremely readable and use proper Markdown spacing.
     : JSON.stringify(cohereResponse.content);
 
   // Step 2: Judge evaluates both solutions
-  const structuredJudge = jModel.withStructuredOutput(judgeSchema);
+  const structuredJudge = (jModel as any).withStructuredOutput(judgeSchema);
 
   const judgePrompt = ChatPromptTemplate.fromMessages([
     [
@@ -103,11 +103,11 @@ Please evaluate both solutions, score them, and provide specific reasoning. Stat
 
   const chain = judgePrompt.pipe(structuredJudge);
 
-  const judgeResponse = await chain.invoke({
+  const judgeResponse = (await chain.invoke({
     problem,
     solution_1,
     solution_2,
-  });
+  })) as JudgeResult;
 
   return {
     problem,

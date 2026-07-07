@@ -5,6 +5,8 @@ export interface IUser extends Document {
   email: string;
   password: string;
   battleCount: number;
+  avatar: string;
+  googleAvatar: string;
   createdAt: Date;
 }
 
@@ -33,6 +35,14 @@ const UserSchema = new Schema<IUser>(
     battleCount: {
       type: Number,
       default: 0,
+    },
+    avatar: {
+      type: String,
+      default: '',
+    },
+    googleAvatar: {
+      type: String,
+      default: '',
     },
   },
   { timestamps: true }

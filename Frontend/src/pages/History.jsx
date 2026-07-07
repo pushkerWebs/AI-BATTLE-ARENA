@@ -1,11 +1,12 @@
 import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion'
 import ShaderBg from '../components/ShaderBg'
 import Icon from '../components/Icon'
 import { C } from '../constants/colors'
 import { useAuth } from '../context/AuthContext'
 import { useTheme } from '../context/ThemeContext'
 import { API_BASE } from '../config'
+import Avatar from '../components/Avatar'
 
 // ─── Formatting helpers ──────────────────────────────────────────────────────
 function formatDate(dStr) {
@@ -37,12 +38,32 @@ function getModelLabel(modelId) {
 }
 
 export default function History({ onNavigate, onSelectBattle }) {
-  const { token, logout } = useAuth()
+  const { user, token, logout } = useAuth()
   const { theme } = useTheme()
   const [history, setHistory] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
   const [search, setSearch] = useState('')
+  const shouldReduceMotion = useReducedMotion()
+
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: shouldReduceMotion ? 0 : 0.04,
+      }
+    }
+  }
+
+  const itemVariants = {
+    hidden: shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      transition: { duration: 0.4, ease: 'easeOut' }
+    }
+  }
 
   // ── Fetch history ──────────────────────────────────────────────────────────
   useEffect(() => {
@@ -121,7 +142,16 @@ export default function History({ onNavigate, onSelectBattle }) {
           BATTLE HISTORY
         </span>
 
-        <div style={{ width: 80 }} /> {/* spacer */}
+        <div style={{ display: 'flex', alignItems: 'center', width: 80, justifyContent: 'flex-end' }}>
+          {user && (
+            <Avatar
+              user={user}
+              size={32}
+              onClick={() => onNavigate('settings')}
+              style={{ cursor: 'pointer', border: `1.5px solid ${C.outlineV}88` }}
+            />
+          )}
+        </div>
       </motion.header>
 
       {/* Main Container */}
@@ -205,9 +235,14 @@ export default function History({ onNavigate, onSelectBattle }) {
             </button>
           </div>
         ) : (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate="show"
+            style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
+          >
             <AnimatePresence>
-              {filtered.map((item, index) => {
+              {filtered.map((item) => {
                 const winnerModel = item.judge.winner === 'solution_1' ? item.model1 : item.model2
                 const isModel1Winner = item.judge.winner === 'solution_1'
                 const scoreDiff = `${item.judge.solution_1_score} vs ${item.judge.solution_2_score}`
@@ -215,9 +250,7 @@ export default function History({ onNavigate, onSelectBattle }) {
                 return (
                   <motion.div
                     key={item._id}
-                    initial={{ opacity: 0, y: 16 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.35, delay: index * 0.05 }}
+                    variants={itemVariants}
                     className="glass-panel history-card"
                     style={{
                       padding: 24, borderRadius: 16,
@@ -316,7 +349,7 @@ export default function History({ onNavigate, onSelectBattle }) {
                 )
               })}
             </AnimatePresence>
-          </div>
+          </motion.div>
         )}
       </div>
 

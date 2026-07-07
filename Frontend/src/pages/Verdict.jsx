@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react'
-import { motion, useInView, AnimatePresence } from 'framer-motion'
+import { motion, useInView, AnimatePresence, useReducedMotion } from 'framer-motion'
 import ShaderBg from '../components/ShaderBg'
 import Sidebar from '../components/Sidebar'
 import Icon from '../components/Icon'
@@ -10,10 +10,10 @@ import { useTheme } from '../context/ThemeContext'
 
 // ─── Shared animation config ──────────────────────────────────────────────────
 const ease = [0.25, 0.46, 0.45, 0.94]
-const fadeUp = (delay = 0) => ({
-  initial: { opacity: 0, y: 22 },
+const fadeUp = (delay = 0, shouldReduceMotion = false) => ({
+  initial: shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 },
   animate: { opacity: 1, y: 0 },
-  transition: { duration: 0.55, delay, ease },
+  transition: { duration: 0.5, delay, ease },
 })
 const fadeIn = (delay = 0) => ({
   initial: { opacity: 0 },
@@ -25,12 +25,19 @@ const fadeIn = (delay = 0) => ({
 function ScoreBar({ pct, winner }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true })
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <div ref={ref} style={{ height: 6, background: C.surfHigh2, borderRadius: 3, overflow: 'hidden' }}>
       <motion.div
-        initial={{ width: 0 }}
-        animate={inView ? { width: `${pct}%` } : { width: 0 }}
-        transition={{ duration: 1.3, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        initial={{ scaleX: 0 }}
+        animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
+        transition={{ duration: shouldReduceMotion ? 0 : 1.3, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
+        style={{
+          width: `${pct}%`,
+          height: '100%',
+          transformOrigin: 'left',
+        }}
         className={winner ? 'score-fill-winner' : 'score-fill-loser'}
       />
     </div>
@@ -41,10 +48,12 @@ function ScoreBar({ pct, winner }) {
 function MetricBar({ label, val, delay }) {
   const ref = useRef(null)
   const inView = useInView(ref, { once: true })
+  const shouldReduceMotion = useReducedMotion()
+
   return (
     <motion.div
       ref={ref}
-      initial={{ opacity: 0, x: 16 }}
+      initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
       animate={inView ? { opacity: 1, x: 0 } : {}}
       transition={{ duration: 0.45, delay, ease }}
       style={{ display: 'flex', flexDirection: 'column', gap: 4 }}
@@ -55,10 +64,16 @@ function MetricBar({ label, val, delay }) {
       </div>
       <div style={{ height: 4, background: C.surfHigh2, borderRadius: 2, overflow: 'hidden' }}>
         <motion.div
-          initial={{ width: 0 }}
-          animate={inView ? { width: `${val}%` } : { width: 0 }}
-          transition={{ duration: 1.1, delay: delay + 0.15, ease: [0.22, 1, 0.36, 1] }}
-          style={{ height: '100%', background: C.primary, borderRadius: 2 }}
+          initial={{ scaleX: 0 }}
+          animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
+          transition={{ duration: shouldReduceMotion ? 0 : 1.1, delay: delay + 0.15, ease: [0.22, 1, 0.36, 1] }}
+          style={{ 
+            height: '100%', 
+            width: `${val}%`,
+            background: C.primary, 
+            borderRadius: 2,
+            transformOrigin: 'left'
+          }}
         />
       </div>
     </motion.div>
@@ -67,6 +82,7 @@ function MetricBar({ label, val, delay }) {
 
 export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
   const { theme } = useTheme()
+  const shouldReduceMotion = useReducedMotion()
   const { problem, solution_1, solution_2, judge, model1, model2, judgeModel } = result
   const winnerIsS1 = judge.winner === 'solution_1'
 
@@ -239,7 +255,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
           {/* Case metadata */}
           <motion.section
-            {...fadeUp(0.05)}
+            {...fadeUp(0.05, shouldReduceMotion)}
             className="glass-panel"
             style={{ padding: 24, borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 16, '--mx': `${coords1.x}px`, '--my': `${coords1.y}px` }}
             onMouseMove={(e) => handleMouseMove(e, 1)}
@@ -266,7 +282,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
           {/* Solutions grid */}
           <motion.section
-            {...fadeUp(0.12)}
+            {...fadeUp(0.12, shouldReduceMotion)}
             style={{ position: 'relative', display: expandedSolution !== null ? 'grid' : undefined, gridTemplateColumns: expandedSolution !== null ? '1fr' : undefined }}
             className={expandedSolution !== null ? '' : 'verdict-grid'}
           >
@@ -295,7 +311,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
             {/* Solution 1 */}
             {(expandedSolution === null || expandedSolution === 'solution_1') && (
               <motion.article
-                initial={{ opacity: 0, x: -24 }}
+                initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.18, ease }}
                 className={`glass-panel ${winnerIsS1 ? 'winner-card' : ''}`}
@@ -343,7 +359,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
             {/* Solution 2 */}
             {(expandedSolution === null || expandedSolution === 'solution_2') && (
               <motion.article
-                initial={{ opacity: 0, x: 24 }}
+                initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.22, ease }}
                 className={`glass-panel ${!winnerIsS1 ? 'winner-card' : ''}`}
@@ -407,13 +423,13 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
           {/* Score row */}
           <motion.section
-            {...fadeUp(0.35)}
+            {...fadeUp(0.35, shouldReduceMotion)}
             className="verdict-score-row"
             style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 24, alignItems: 'center' }}
           >
             {/* Score 1 */}
             <motion.div
-              initial={{ opacity: 0, x: -20 }}
+              initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.38, ease }}
               className="glass-panel"
@@ -441,7 +457,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
                   strokeDasharray={arcLen}
                   initial={{ strokeDashoffset: arcLen }}
                   animate={arcInView ? { strokeDashoffset: arcLen * (1 - confidencePercent / 100) } : {}}
-                  transition={{ duration: 1.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: shouldReduceMotion ? 0 : 1.5, delay: 0.5, ease: [0.22, 1, 0.36, 1] }}
                   className="confidence-arc"
                   strokeLinecap="round"
                 />
@@ -454,7 +470,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
             {/* Score 2 */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.38, ease }}
               className="glass-panel"
@@ -475,7 +491,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
           {/* Analysis + metrics */}
           <motion.section
-            {...fadeUp(0.45)}
+            {...fadeUp(0.45, shouldReduceMotion)}
             className="verdict-analysis-row"
             style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}
           >
@@ -491,7 +507,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
                 ].map((card) => (
                   <motion.div
                     key={card.label}
-                    initial={{ opacity: 0, y: 18 }}
+                    initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.48, delay: card.delay, ease }}
                     className="glass-panel"
@@ -507,7 +523,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
               {judge.overall_verdict && (
                 <motion.div
-                  initial={{ opacity: 0, y: 14 }}
+                  initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.48, delay: 0.65, ease }}
                   className="glass-panel"
@@ -523,7 +539,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
             {/* Metrics */}
             <motion.div
-              initial={{ opacity: 0, x: 20 }}
+              initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.5, ease }}
               style={{ display: 'flex', flexDirection: 'column', gap: 16 }}
@@ -546,15 +562,15 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
 
           {/* CTA */}
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={shouldReduceMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.7, ease }}
             style={{ display: 'flex', justifyContent: 'center', marginTop: 16 }}
           >
             <motion.button
               onClick={onNew}
-              whileHover={{ scale: 1.05, boxShadow: '0 0 28px rgba(255,255,255,0.15)' }}
-              whileTap={{ scale: 0.97 }}
+              whileHover={shouldReduceMotion ? {} : { scale: 1.02, boxShadow: '0 0 28px rgba(255,255,255,0.15)' }}
+              whileTap={shouldReduceMotion ? {} : { scale: 0.985 }}
               className="btn-glow"
               style={{
                 display: 'flex', alignItems: 'center', gap: 8,
@@ -581,8 +597,8 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
         {[
           { icon: 'add_circle', label: 'New', onClick: onNew },
           { icon: 'history', label: 'History', onClick: () => onNavigate('history') },
-          { icon: 'star', label: 'Favs', onClick: () => {} },
-          { icon: 'menu', label: 'Menu', onClick: () => {} }
+          { icon: 'star', label: 'Favs', onClick: () => { } },
+          { icon: 'menu', label: 'Menu', onClick: () => { } }
         ].map((item, i) => (
           <button key={item.label} onClick={item.onClick} style={{
             display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,

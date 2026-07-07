@@ -1,20 +1,26 @@
 import './app/App.css'
-import { useState, useCallback, useEffect } from 'react'
+import { useState, useCallback, useEffect, lazy, Suspense } from 'react'
 import Lenis from 'lenis'
+import { AuthProvider } from './context/AuthContext'
+import { ThemeProvider } from './context/ThemeContext'
+import Loader from './components/Loader'
+
 import Home from './pages/Home'
 import Comparing from './pages/Comparing'
 import Verdict from './pages/Verdict'
 import Documentation from './pages/Documentation'
 import Auth from './pages/Auth'
 import History from './pages/History'
-import { AuthProvider } from './context/AuthContext'
-import { ThemeProvider } from './context/ThemeContext'
 
 function AppInner() {
-  const [view, setView]       = useState('home')
+  const [view, setView] = useState('home')
+  const [appLoading, setAppLoading] = useState(() => {
+    const hasVisited = sessionStorage.getItem('ai_arena_visited')
+    return !hasVisited
+  })
   const [problem, setProblem] = useState('')
-  const [result, setResult]   = useState(null)
-  const [error, setError]     = useState('')
+  const [result, setResult] = useState(null)
+  const [error, setError] = useState('')
 
 
   // ── Lenis smooth scroll ──────────────────────────────────
@@ -32,8 +38,8 @@ function AppInner() {
     return () => lenis.destroy()
   }, [])
 
-  const [model1, setModel1]         = useState('mistral-medium-latest')
-  const [model2, setModel2]         = useState('command-a-03-2025')
+  const [model1, setModel1] = useState('mistral-medium-latest')
+  const [model2, setModel2] = useState('command-a-03-2025')
   const [judgeModel, setJudgeModel] = useState('gemini-2.5-flash')
 
   const handleBattle = useCallback((p) => {
@@ -62,67 +68,89 @@ function AppInner() {
 
   return (
     <>
-      {view === 'home' && (
-        <Home
-          onBattle={handleBattle}
-          onNavigate={setView}
-          error={error}
-          model1={model1}
-          setModel1={setModel1}
-          model2={model2}
-          setModel2={setModel2}
-          judgeModel={judgeModel}
-          setJudgeModel={setJudgeModel}
-        />
-      )}
+      {appLoading ? (
+        <Loader onComplete={() => {
+          sessionStorage.setItem('ai_arena_visited', 'true')
+          setAppLoading(false)
+        }} />
+      ) : (
+        <div style={{ width: '100%', minHeight: '100vh' }}>
+          <Suspense fallback={
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              minHeight: '100vh', background: '#070708', color: '#e5e2e1',
+              fontFamily: "'Geist Pixel', monospace", fontSize: 13,
+            }}>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                <span className="material-symbols-outlined animate-spin" style={{ fontSize: 24, color: '#a855f7' }}>progress_activity</span>
+                <span style={{ letterSpacing: '0.1em' }}>ARENA LOADING...</span>
+              </div>
+            </div>
+          }>
+            {view === 'home' && (
+              <Home
+                onBattle={handleBattle}
+                onNavigate={setView}
+                error={error}
+                model1={model1}
+                setModel1={setModel1}
+                model2={model2}
+                setModel2={setModel2}
+                judgeModel={judgeModel}
+                setJudgeModel={setJudgeModel}
+              />
+            )}
 
-      {view === 'comparing' && (
-        <Comparing
-          problem={problem}
-          model1={model1}
-          model2={model2}
-          judgeModel={judgeModel}
-          onDone={handleDone}
-          onNavigate={setView}
-          onSelectBattle={(battle) => {
-            setResult(battle)
-            setView('verdict')
-          }}
-        />
-      )}
+            {view === 'comparing' && (
+              <Comparing
+                problem={problem}
+                model1={model1}
+                model2={model2}
+                judgeModel={judgeModel}
+                onDone={handleDone}
+                onNavigate={setView}
+                onSelectBattle={(battle) => {
+                  setResult(battle)
+                  setView('verdict')
+                }}
+              />
+            )}
 
-      {view === 'verdict' && result && (
-        <Verdict
-          result={result}
-          onNew={handleHome}
-          onNavigate={setView}
-          onSelectBattle={(battle) => {
-            setResult(battle)
-            setView('verdict')
-          }}
-        />
-      )}
+            {view === 'verdict' && result && (
+              <Verdict
+                result={result}
+                onNew={handleHome}
+                onNavigate={setView}
+                onSelectBattle={(battle) => {
+                  setResult(battle)
+                  setView('verdict')
+                }}
+              />
+            )}
 
-      {view === 'documentation' && (
-        <Documentation
-          onNavigate={setView}
-        />
-      )}
+            {view === 'documentation' && (
+              <Documentation
+                onNavigate={setView}
+              />
+            )}
 
-      {view === 'auth' && (
-        <Auth
-          onNavigate={setView}
-        />
-      )}
+            {view === 'auth' && (
+              <Auth
+                onNavigate={setView}
+              />
+            )}
 
-      {view === 'history' && (
-        <History
-          onNavigate={setView}
-          onSelectBattle={(battle) => {
-            setResult(battle)
-            setView('verdict')
-          }}
-        />
+            {view === 'history' && (
+              <History
+                onNavigate={setView}
+                onSelectBattle={(battle) => {
+                  setResult(battle)
+                  setView('verdict')
+                }}
+              />
+            )}
+          </Suspense>
+        </div>
       )}
     </>
   )
