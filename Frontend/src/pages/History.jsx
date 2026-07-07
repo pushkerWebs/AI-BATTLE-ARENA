@@ -147,8 +147,7 @@ export default function History({ onNavigate, onSelectBattle }) {
             <Avatar
               user={user}
               size={32}
-              onClick={() => onNavigate('settings')}
-              style={{ cursor: 'pointer', border: `1.5px solid ${C.outlineV}88` }}
+              style={{ border: `1.5px solid ${C.outlineV}88` }}
             />
           )}
         </div>

@@ -260,7 +260,7 @@ const Header = React.memo(({ onNavigate }) => {
                   <button
                     onClick={() => {
                       setProfileOpen(false)
-                      onNavigate('settings')
+                      onNavigate('history')
                     }}
                     style={{
                       width: '100%',
@@ -279,7 +279,7 @@ const Header = React.memo(({ onNavigate }) => {
                     onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
                     onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
                   >
-                    Profile Settings
+                    Battle History
                   </button>
 
                   <button

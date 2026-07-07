@@ -322,7 +322,7 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
 
   useEffect(() => {
     /* global google */
-    if (typeof google !== 'undefined') {
+    if (typeof google !== 'undefined' && !authLoading && !user) {
       try {
         google.accounts.id.initialize({
           client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
@@ -334,7 +334,7 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
             theme: 'dark',
             size: 'large',
             width: btnContainer.clientWidth || 404,
-            text: tab === 'login' ? 'signin_with' : 'signup_with',
+            text: 'continue_with',
             shape: 'rectangular',
           })
         }
@@ -342,7 +342,7 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
         console.error('Error rendering Google Sign-In button:', err)
       }
     }
-  }, [tab, theme, googleLogin, authLoading, user])
+  }, [theme, googleLogin, authLoading, user])
 
   const handleLogin = async (e) => {
     e.preventDefault()
@@ -629,225 +629,234 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
                   </button>
                 </div>
 
-                <AnimatePresence mode="wait">
-                  {tab === 'login' ? (
-                    /* SIGN IN FORM */
-                    <motion.form
-                      key="login-form"
-                      initial={{ opacity: 0, y: 3 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -3 }}
-                      transition={{ duration: 0.12 }}
-                      onSubmit={handleLogin}
-                      style={{ display: 'flex', flexDirection: 'column' }}
-                    >
-                      <AuthInput
-                        id="login-email"
-                        label="Email Address"
-                        type="email"
-                        value={loginEmail}
-                        onChange={e => setLoginEmail(e.target.value)}
-                        placeholder="name@domain.com"
-                        required
-                        error={loginEmailError}
-                      />
+                <div style={{ position: 'relative', minHeight: 270, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+                  <AnimatePresence mode="wait">
+                    {tab === 'login' ? (
+                      /* SIGN IN FORM */
+                      <motion.form
+                        key="login-form"
+                        initial={{ opacity: 0, y: 3 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -3 }}
+                        transition={{ duration: 0.12 }}
+                        onSubmit={handleLogin}
+                        style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
+                      >
+                        <AuthInput
+                          id="login-email"
+                          label="Email Address"
+                          type="email"
+                          value={loginEmail}
+                          onChange={e => setLoginEmail(e.target.value)}
+                          placeholder="name@domain.com"
+                          required
+                          error={loginEmailError}
+                        />
 
-                      <AuthInput
-                        id="login-password"
-                        label="Password"
-                        type="password"
-                        value={loginPassword}
-                        onChange={e => setLoginPassword(e.target.value)}
-                        placeholder="••••••••"
-                        required
-                      />
+                        <AuthInput
+                          id="login-password"
+                          label="Password"
+                          type="password"
+                          value={loginPassword}
+                          onChange={e => setLoginPassword(e.target.value)}
+                          placeholder="••••••••"
+                          required
+                        />
 
-                      {/* Options Row */}
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16, fontSize: 12, fontFamily: 'system-ui, sans-serif' }}>
-                        <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#71717a', cursor: 'pointer' }}>
-                          <input
-                            type="checkbox"
-                            checked={rememberMe}
-                            onChange={(e) => setRememberMe(e.target.checked)}
-                            style={{
-                              accentColor: '#3b82f6',
-                              cursor: 'pointer',
-                            }}
-                          />
-                          Remember me
-                        </label>
-                        <a
-                          href="#"
-                          onClick={(e) => { e.preventDefault(); alert('Password reset is simulated.') }}
-                          style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 500 }}
+                        {/* Options Row */}
+                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4, fontSize: 12, fontFamily: 'system-ui, sans-serif' }}>
+                          <label style={{ display: 'flex', alignItems: 'center', gap: 6, color: '#71717a', cursor: 'pointer' }}>
+                            <input
+                              type="checkbox"
+                              checked={rememberMe}
+                              onChange={(e) => setRememberMe(e.target.checked)}
+                              style={{
+                                accentColor: '#3b82f6',
+                                cursor: 'pointer',
+                              }}
+                            />
+                            Remember me
+                          </label>
+                          <a
+                            href="#"
+                            onClick={(e) => { e.preventDefault(); alert('Password reset is simulated.') }}
+                            style={{ color: '#3b82f6', textDecoration: 'none', fontWeight: 500 }}
+                          >
+                            Forgot Password?
+                          </a>
+                        </div>
+
+                        {loginError && (
+                          <div style={{
+                            display: 'flex', alignItems: 'center', gap: 8,
+                            background: 'rgba(239, 68, 68, 0.08)',
+                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                            borderRadius: 6, padding: '6px 10px',
+                          }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#ef4444' }}>error</span>
+                            <span style={{ fontSize: 11, color: '#fca5a5' }}>
+                              {loginError}
+                            </span>
+                          </div>
+                        )}
+
+                        {/* Submit Button */}
+                        <button
+                          type="submit"
+                          disabled={loginLoading || !loginEmail || !loginPassword || !!loginEmailError}
+                          style={{
+                            width: '100%', padding: '9px 12px',
+                            background: loginLoading || !loginEmail || !loginPassword || !!loginEmailError ? '#27272a' : '#ffffff',
+                            color: loginLoading || !loginEmail || !loginPassword || !!loginEmailError ? '#71717a' : '#09090b',
+                            border: 'none',
+                            borderRadius: 6,
+                            fontSize: 13, fontWeight: 600,
+                            cursor: loginLoading || !loginEmail || !loginPassword || !!loginEmailError ? 'not-allowed' : 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            transition: 'opacity 0.15s ease',
+                          }}
+                          onMouseEnter={e => {
+                            if (!(loginLoading || !loginEmail || !loginPassword || !!loginEmailError)) {
+                              e.currentTarget.style.opacity = '0.9'
+                            }
+                          }}
+                          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
                         >
-                          Forgot Password?
-                        </a>
-                      </div>
-
-                      {loginError && (
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: 8,
-                          background: 'rgba(239, 68, 68, 0.08)',
-                          border: '1px solid rgba(239, 68, 68, 0.2)',
-                          borderRadius: 6, padding: '6px 10px', marginBottom: 12,
-                        }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#ef4444' }}>error</span>
-                          <span style={{ fontSize: 11, color: '#fca5a5' }}>
-                            {loginError}
-                          </span>
-                        </div>
-                      )}
-
-                      {/* Submit Button */}
-                      <button
-                        type="submit"
-                        disabled={loginLoading || !loginEmail || !loginPassword || !!loginEmailError}
-                        style={{
-                          width: '100%', padding: '9px 12px',
-                          background: loginLoading || !loginEmail || !loginPassword || !!loginEmailError ? '#27272a' : '#ffffff',
-                          color: loginLoading || !loginEmail || !loginPassword || !!loginEmailError ? '#71717a' : '#09090b',
-                          border: 'none',
-                          borderRadius: 6,
-                          fontSize: 13, fontWeight: 600,
-                          cursor: loginLoading || !loginEmail || !loginPassword || !!loginEmailError ? 'not-allowed' : 'pointer',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                          transition: 'opacity 0.15s ease',
-                        }}
-                        onMouseEnter={e => {
-                          if (!(loginLoading || !loginEmail || !loginPassword || !!loginEmailError)) {
-                            e.currentTarget.style.opacity = '0.9'
-                          }
-                        }}
-                        onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                          {loginLoading ? (
+                            <>
+                              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 15 }}>progress_activity</span>
+                              Signing In...
+                            </>
+                          ) : (
+                            'Sign In'
+                          )}
+                        </button>
+                      </motion.form>
+                    ) : (
+                      /* SIGN UP FORM */
+                      <motion.form
+                        key="signup-form"
+                        initial={{ opacity: 0, y: 3 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -3 }}
+                        transition={{ duration: 0.12 }}
+                        onSubmit={handleSignup}
+                        style={{ display: 'flex', flexDirection: 'column', gap: 10 }}
                       >
-                        {loginLoading ? (
-                          <>
-                            <span className="material-symbols-outlined animate-spin" style={{ fontSize: 15 }}>progress_activity</span>
-                            Signing In...
-                          </>
-                        ) : (
-                          'Sign In'
-                        )}
-                      </button>
+                        <AuthInput
+                          id="signup-name"
+                          label="Full Name"
+                          type="text"
+                          value={signupName}
+                          onChange={e => setSignupName(e.target.value)}
+                          placeholder="Alex Smith"
+                          required
+                          error={signupErrors.name}
+                        />
 
-                      <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '12px 0' }}>
-                        <div style={{ flex: 1, height: 1, background: '#27272a' }} />
-                        <span style={{ fontSize: 11, color: '#71717a' }}>or continue with</span>
-                        <div style={{ flex: 1, height: 1, background: '#27272a' }} />
-                      </div>
+                        <AuthInput
+                          id="signup-email"
+                          label="Email Address"
+                          type="email"
+                          value={signupEmail}
+                          onChange={e => setSignupEmail(e.target.value)}
+                          placeholder="name@domain.com"
+                          required
+                          error={signupErrors.email || signupEmailError}
+                        />
 
-                      {/* Google Sign In Button */}
-                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
-                        <div id="google-signin-btn" style={{ width: '100%' }}></div>
-                      </div>
-                    </motion.form>
-                  ) : (
-                    /* SIGN UP FORM */
-                    <motion.form
-                      key="signup-form"
-                      initial={{ opacity: 0, y: 3 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -3 }}
-                      transition={{ duration: 0.12 }}
-                      onSubmit={handleSignup}
-                      style={{ display: 'flex', flexDirection: 'column' }}
-                    >
-                      <AuthInput
-                        id="signup-name"
-                        label="Full Name"
-                        type="text"
-                        value={signupName}
-                        onChange={e => setSignupName(e.target.value)}
-                        placeholder="Alex Smith"
-                        required
-                        error={signupErrors.name}
-                      />
-
-                      <AuthInput
-                        id="signup-email"
-                        label="Email Address"
-                        type="email"
-                        value={signupEmail}
-                        onChange={e => setSignupEmail(e.target.value)}
-                        placeholder="name@domain.com"
-                        required
-                        error={signupErrors.email || signupEmailError}
-                      />
-
-                      <AuthInput
-                        id="signup-password"
-                        label="Password"
-                        type="password"
-                        value={signupPassword}
-                        onChange={e => setSignupPassword(e.target.value)}
-                        placeholder="Min. 6 characters"
-                        required
-                        error={signupErrors.password}
-                      />
-
-                      {/* Real-time Strength Meter */}
-                      <PasswordStrengthMeter password={signupPassword} />
-
-                      <AuthInput
-                        id="signup-confirm"
-                        label="Confirm Password"
-                        type="password"
-                        value={signupConfirm}
-                        onChange={e => setSignupConfirm(e.target.value)}
-                        placeholder="••••••••"
-                        required
-                        error={signupErrors.confirm || signupMatchError}
-                      />
-
-                      {signupErrors.general && (
-                        <div style={{
-                          display: 'flex', alignItems: 'center', gap: 8,
-                          background: 'rgba(239, 68, 68, 0.08)',
-                          border: '1px solid rgba(239, 68, 68, 0.2)',
-                          borderRadius: 6, padding: '6px 10px', marginBottom: 12,
-                        }}>
-                          <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#ef4444' }}>error</span>
-                          <span style={{ fontSize: 11, color: '#fca5a5' }}>
-                            {signupErrors.general}
-                          </span>
+                        <div style={{ display: 'flex', gap: 12 }}>
+                          <div style={{ flex: 1 }}>
+                            <AuthInput
+                              id="signup-password"
+                              label="Password"
+                              type="password"
+                              value={signupPassword}
+                              onChange={e => setSignupPassword(e.target.value)}
+                              placeholder="Min. 6 chars"
+                              required
+                              error={signupErrors.password}
+                            />
+                          </div>
+                          <div style={{ flex: 1 }}>
+                            <AuthInput
+                              id="signup-confirm"
+                              label="Confirm Password"
+                              type="password"
+                              value={signupConfirm}
+                              onChange={e => setSignupConfirm(e.target.value)}
+                              placeholder="••••••••"
+                              required
+                              error={signupErrors.confirm || signupMatchError}
+                            />
+                          </div>
                         </div>
-                      )}
 
-                      {/* Submit Button */}
-                      <button
-                        type="submit"
-                        disabled={signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError}
-                        style={{
-                          width: '100%', padding: '9px 12px',
-                          background: signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError ? '#27272a' : '#ffffff',
-                          color: signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError ? '#71717a' : '#09090b',
-                          border: 'none',
-                          borderRadius: 6,
-                          fontSize: 13, fontWeight: 600,
-                          cursor: signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError ? 'not-allowed' : 'pointer',
-                          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
-                          transition: 'opacity 0.15s ease',
-                        }}
-                        onMouseEnter={e => {
-                          if (!(signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError)) {
-                            e.currentTarget.style.opacity = '0.9'
-                          }
-                        }}
-                        onMouseLeave={e => e.currentTarget.style.opacity = '1'}
-                      >
-                        {signupLoading ? (
-                          <>
-                            <span className="material-symbols-outlined animate-spin" style={{ fontSize: 15 }}>progress_activity</span>
-                            Registering...
-                          </>
-                        ) : (
-                          'Create Account'
+                        {/* Real-time Strength Meter */}
+                        <PasswordStrengthMeter password={signupPassword} />
+
+                        {signupErrors.general && (
+                          <div style={{
+                            display: 'flex', alignItems: 'center', gap: 8,
+                            background: 'rgba(239, 68, 68, 0.08)',
+                            border: '1px solid rgba(239, 68, 68, 0.2)',
+                            borderRadius: 6, padding: '6px 10px',
+                          }}>
+                            <span className="material-symbols-outlined" style={{ fontSize: 15, color: '#ef4444' }}>error</span>
+                            <span style={{ fontSize: 11, color: '#fca5a5' }}>
+                              {signupErrors.general}
+                            </span>
+                          </div>
                         )}
-                      </button>
-                    </motion.form>
-                  )}
-                </AnimatePresence>
+
+                        {/* Submit Button */}
+                        <button
+                          type="submit"
+                          disabled={signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError}
+                          style={{
+                            width: '100%', padding: '9px 12px',
+                            background: signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError ? '#27272a' : '#ffffff',
+                            color: signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError ? '#71717a' : '#09090b',
+                            border: 'none',
+                            borderRadius: 6,
+                            fontSize: 13, fontWeight: 600,
+                            cursor: signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError ? 'not-allowed' : 'pointer',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6,
+                            transition: 'opacity 0.15s ease',
+                          }}
+                          onMouseEnter={e => {
+                            if (!(signupLoading || !signupName || !signupEmail || !signupPassword || !signupConfirm || !!signupEmailError || !!signupMatchError)) {
+                              e.currentTarget.style.opacity = '0.9'
+                            }
+                          }}
+                          onMouseLeave={e => e.currentTarget.style.opacity = '1'}
+                        >
+                          {signupLoading ? (
+                            <>
+                              <span className="material-symbols-outlined animate-spin" style={{ fontSize: 15 }}>progress_activity</span>
+                              Registering...
+                            </>
+                          ) : (
+                            'Create Account'
+                          )}
+                        </button>
+                      </motion.form>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                {/* Shared Divider & Google button mounted permanently */}
+                <div style={{ marginTop: 16 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 10, margin: '0 0 16px' }}>
+                    <div style={{ flex: 1, height: 1, background: '#27272a' }} />
+                    <span style={{ fontSize: 11, color: '#71717a' }}>or continue with</span>
+                    <div style={{ flex: 1, height: 1, background: '#27272a' }} />
+                  </div>
+
+                  <div style={{ display: 'flex', flexDirection: 'column' }}>
+                    <div id="google-signin-btn" style={{ width: '100%', minHeight: 40 }}></div>
+                  </div>
+                </div>
               </div>
 
               {/* Footer terms */}
