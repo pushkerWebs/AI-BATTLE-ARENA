@@ -45,16 +45,6 @@ This project was built to simplify AI comparison for developers, students, resea
 
 ---
 
-## 🖥️ Screenshots
-
-> Add screenshots inside a `screenshots` folder and replace the paths below.
-
-| Home                      | Battle Result               |
-| ------------------------- | --------------------------- |
-| ![](screenshots/home.png) | ![](screenshots/result.png) |
-
----
-
 # ⚙️ How It Works
 
 ```text
