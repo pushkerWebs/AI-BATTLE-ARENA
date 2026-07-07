@@ -1,4 +1,5 @@
 @import "tailwindcss";
+/* Vite Cache Invalidation Trigger Comment */
 
 /* ─── Font families & Default Dark Mode tokens (fallback) ─ */
 :root {
