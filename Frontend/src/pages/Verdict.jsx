@@ -191,10 +191,10 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
           initial={{ y: -16, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.45, ease }}
+          className="verdict-header"
           style={{
             position: 'sticky', top: 0, zIndex: 50,
             display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-            padding: '12px 24px',
             background: theme === 'light' ? 'rgba(255, 255, 255, 0.35)' : 'rgba(0, 0, 0, 0.35)',
             backdropFilter: 'blur(20px)',
             borderBottom: 'none',
@@ -226,7 +226,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
             }}>Verdict Mode</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+          <div className="verdict-header-nav" style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
             <div style={{ width: 1, height: 24, background: `${C.outlineV}22` }} />
             <motion.button
               whileHover={{ color: C.primary }}
@@ -240,10 +240,13 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
               style={{ background: 'none', border: 'none', color: C.onSurfVar, fontFamily: "'Geist Pixel', monospace", fontSize: 12, cursor: 'pointer', transition: 'color 0.2s' }}
             >Documentation</motion.button>
             <div style={{ width: 1, height: 24, background: `${C.outlineV}22` }} />
-            <motion.button
+            <motion.a
               whileHover={{ color: C.primary }}
-              style={{ background: 'none', border: 'none', color: C.onSurfVar, fontFamily: "'Geist Pixel', monospace", fontSize: 12, cursor: 'pointer', transition: 'color 0.2s' }}
-            >GitHub</motion.button>
+              href="https://github.com/pushkerWebs/AI-BATTLE-ARENA"
+              target="_blank"
+              rel="noopener noreferrer"
+              style={{ display: 'inline-block', textDecoration: 'none', color: C.onSurfVar, fontFamily: "'Geist Pixel', monospace", fontSize: 12, cursor: 'pointer', transition: 'color 0.2s' }}
+            >GitHub</motion.a>
             <div style={{ width: 32, height: 32, borderRadius: '50%', background: `${C.primary}1a`, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
               <Icon n="person" size={16} style={{ color: C.primary }} />
             </div>
@@ -251,7 +254,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
         </motion.header>
 
         {/* Content */}
-        <main style={{ maxWidth: 1280, width: '100%', margin: '0 auto', padding: '24px 20px 80px', display: 'flex', flexDirection: 'column', gap: 32 }}>
+        <main className="verdict-main">
 
           {/* Case metadata */}
           <motion.section
@@ -493,14 +496,13 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
           <motion.section
             {...fadeUp(0.45, shouldReduceMotion)}
             className="verdict-analysis-row"
-            style={{ display: 'grid', gridTemplateColumns: '1fr 300px', gap: 24, alignItems: 'start' }}
           >
             {/* Reasoning */}
             <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
               <h5 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 500, margin: 0, color: C.primary }}>
                 <Icon n="analytics" size={18} /> Reasoning Analysis
               </h5>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: 16 }}>
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
                 {[
                   { icon: 'info', color: C.onSurfVar, label: `${model1Name.toUpperCase()} CRITIQUE`, text: judge.solution_1_reasoning ?? 'The output provides a solid initial architecture, but lacks detailed refresh token rotation logic, potentially creating session vulnerability.', delay: 0.5 },
                   { icon: 'verified', color: C.primary, label: `${model2Name.toUpperCase()} STRENGTHS`, text: judge.solution_2_reasoning ?? 'Excellent structural modularity and repository separation. Directly tackles security tokens with explicit rotation and audit logging.', delay: 0.58 },
@@ -585,32 +587,6 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
           </motion.div>
         </main>
       </div>
-
-      {/* Mobile nav */}
-      <footer id="mobile-nav" style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        display: 'none', justifyContent: 'space-around', alignItems: 'center',
-        padding: '8px 16px 12px',
-        background: `${C.surfHigh2}e6`, backdropFilter: 'blur(20px)',
-        borderTop: `1px solid ${C.outlineV}33`, borderRadius: '16px 16px 0 0',
-      }}>
-        {[
-          { icon: 'add_circle', label: 'New', onClick: onNew },
-          { icon: 'history', label: 'History', onClick: () => onNavigate('history') },
-          { icon: 'star', label: 'Favs', onClick: () => { } },
-          { icon: 'menu', label: 'Menu', onClick: () => { } }
-        ].map((item, i) => (
-          <button key={item.label} onClick={item.onClick} style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-            background: i === 0 ? C.primary : 'transparent',
-            color: i === 0 ? C.onPrimary : C.onSurfVar,
-            fontFamily: "'Geist Pixel', monospace", fontSize: 11,
-          }}>
-            <Icon n={item.icon} size={20} style={{ color: 'inherit' }} />{item.label}
-          </button>
-        ))}
-      </footer>
     </div>
   )
 }

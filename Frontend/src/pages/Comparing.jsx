@@ -207,8 +207,8 @@ export default function Comparing({ problem, model1, model2, judgeModel, onDone,
           initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5, ease: 'easeOut' }}
+          className="comparing-step-container"
           style={{
-            width: '100%', maxWidth: 460,
             display: 'flex', flexDirection: 'column',
             alignItems: 'center', gap: 32,
           }}
@@ -254,26 +254,6 @@ export default function Comparing({ problem, model1, model2, judgeModel, onDone,
         </motion.div>
       </main>
 
-      {/* Mobile bottom nav */}
-      <nav id="mobile-nav" style={{
-        position: 'fixed', bottom: 0, left: 0, right: 0, zIndex: 50,
-        display: 'none', justifyContent: 'space-around', alignItems: 'center',
-        padding: '8px 16px 12px',
-        background: `${C.surfHigh2}e6`, backdropFilter: 'blur(20px)',
-        borderTop: `1px solid ${C.outlineV}33`, borderRadius: '16px 16px 0 0',
-      }}>
-        {[['add_circle','New'],['history','History'],['star','Favs'],['menu','Menu']].map(([ic, lb], i) => (
-          <button key={lb} style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            padding: '6px 14px', borderRadius: 10, border: 'none', cursor: 'pointer',
-            background: i === 0 ? C.primary : 'transparent',
-            color: i === 0 ? C.onPrimary : C.onSurfVar,
-            fontFamily: "'Geist Pixel', monospace", fontSize: 11,
-          }}>
-            <Icon n={ic} size={20} style={{ color: 'inherit' }} />{lb}
-          </button>
-        ))}
-      </nav>
     </div>
   )
 }

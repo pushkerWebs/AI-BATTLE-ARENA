@@ -1,12 +1,50 @@
 @import "tailwindcss";
 
-/* ─── Font families (always available) ──────────────────── */
+/* ─── Font families & Default Dark Mode tokens (fallback) ─ */
 :root {
   --font-brand:    'Michroma', 'Helvetica', Arial, sans-serif;
   --font-pixel:    'Geist Pixel', monospace;
   --font-sekuya:   'Sekuya', sans-serif;
   --font-body:     'Helvetica', Arial, sans-serif;
   --font-mono:     'JetBrains Mono', monospace;
+
+  /* Default theme values (Dark theme) to prevent unstyled flash */
+  --color-bg: #090909;
+  --color-surface: #141313;
+  --color-surf-low: #1c1b1b;
+  --color-surf-mid: #201f1f;
+  --color-surf-high: #2a2a2a;
+  --color-surf-high2: #353434;
+  --color-surf-low2: #0e0e0e;
+  --color-on-surf: #e5e2e1;
+  --color-on-surf-var: #c4c7c8;
+  --color-outline: #8e9192;
+  --color-outline-v: #444748;
+  --color-primary: #ffffff;
+  --color-primary-glow: #a855f7;
+  --color-on-primary: #2f3131;
+  --color-secondary: #b9c8de;
+  --color-sec-cont: #39485a;
+  --color-code-bg: #050505;
+  --color-surface-glass: rgba(17, 17, 17, 0.7);
+  --color-glow-shadow: rgba(255, 255, 255, 0.12);
+  --color-winner-border: #ffffff;
+  --color-hero-title: #e5e2e1;
+  --color-hero-accent-text: inherit;
+  --color-hero-accent-primary: inherit;
+
+  /* Markdown dark mode tokens */
+  --md-text:         #e5e2e1;
+  --md-heading:      #ffffff;
+  --md-strong:       #ffffff;
+  --md-link:         #ffffff;
+  --md-code-bg:      rgba(255, 255, 255, 0.08);
+  --md-code-color:   #ffffff;
+  --md-pre-bg:       #050505;
+  --md-border:       #444748;
+  --md-th-bg:        rgba(255, 255, 255, 0.04);
+  --md-td-color:     #c4c7c8;
+  --md-blockquote:   #8e9192;
 }
 
 /* ─── Dark mode tokens (default) ────────────────────────── */
@@ -94,7 +132,10 @@
 /* ─── Base reset ─────────────────────────────────────────── */
 *, *::before, *::after { box-sizing: border-box; }
 html, body, #root { margin: 0; padding: 0; width: 100%; min-height: 100vh; }
-html { scroll-behavior: smooth; }   /* fallback for non-Lenis contexts */
+/* NOTE: scroll-behavior: smooth is intentionally NOT set here.
+   Lenis handles all smooth scrolling. Setting scroll-behavior: smooth
+   on <html> causes the browser to animate its scroll-restoration on
+   page refresh, which creates a visible 20-60px jump. */
 
 body {
   background-color: var(--color-bg);
@@ -362,9 +403,190 @@ body {
   display: inline-block;
 }
 
-/* ─── Mobile nav — only visible on small screens ─────────── */
+/* ─── Mobile nav — hidden (replaced by hamburger) ────────── */
+/* Old bottom bar is removed. Mobile navigation is now via the hamburger drawer. */
+
+/* ─── Hamburger button — only on mobile ──────────────────── */
+.hamburger-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  border: 1px solid var(--color-outline-v);
+  background: transparent;
+  cursor: pointer;
+  color: var(--color-on-surf-var);
+  flex-shrink: 0;
+  transition: background 0.15s, border-color 0.15s;
+}
+.hamburger-btn:hover {
+  background: var(--color-surf-high);
+  border-color: var(--color-outline);
+}
+@media (max-width: 640px) {
+  .hamburger-btn { display: flex; }
+  .navbar-pill    { display: none !important; }
+  /* Hide desktop-only auth buttons on mobile, hamburger handles nav */
+  .desktop-auth   { display: none !important; }
+}
+
+/* ─── Mobile drawer overlay ───────────────────────────────── */
+.mobile-drawer-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(4px);
+  z-index: 200;
+}
+
+/* ─── Mobile drawer panel ─────────────────────────────────── */
+.mobile-drawer {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100dvh;
+  width: min(300px, 85vw);
+  z-index: 201;
+  display: flex;
+  flex-direction: column;
+  background: var(--color-surf-low);
+  border-left: 1px solid var(--color-outline-v);
+  box-shadow: -16px 0 48px rgba(0, 0, 0, 0.4);
+}
+
+/* ─── Responsive: Home page main padding ─────────────────── */
+.home-main {
+  padding-left: clamp(16px, 4vw, 48px);
+  padding-right: clamp(16px, 4vw, 48px);
+}
 @media (max-width: 767px) {
-  #mobile-nav { display: flex !important; }
+  .model-selectors-grid {
+    max-width: 100%;
+  }
+}
+
+/* ─── Responsive: Navbar pill — hide links on small screens ─ */
+@media (max-width: 640px) {
+  .navbar-pill {
+    display: none !important;
+  }
+}
+
+/* ─── Responsive: Model selectors grid ───────────────────── */
+.model-selectors-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  max-width: 720px;
+  margin-bottom: 20px;
+  text-align: left;
+}
+@media (max-width: 768px) {
+  .model-selectors-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 480px) {
+  .model-selectors-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* ─── Responsive: HowItWorks steps ───────────────────────── */
+.how-steps-row {
+  display: flex;
+  gap: 0;
+  align-items: flex-start;
+  position: relative;
+}
+@media (max-width: 768px) {
+  .how-steps-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 40px 0;
+  }
+  .how-step-connector { display: none !important; }
+}
+@media (max-width: 480px) {
+  .how-steps-row {
+    grid-template-columns: 1fr;
+    gap: 40px 0;
+  }
+}
+
+/* ─── Responsive: Hero section padding ───────────────────── */
+.hero-section {
+  padding-top: clamp(40px, 7vw, 80px);
+  padding-bottom: clamp(32px, 5vw, 64px);
+}
+
+/* ─── Responsive: Verdict header nav ─────────────────────── */
+@media (max-width: 768px) {
+  .verdict-header-nav { display: none !important; }
+}
+
+/* ─── Responsive: Verdict main content padding ───────────── */
+.verdict-main {
+  max-width: 1280px;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(16px, 3vw, 24px) clamp(12px, 3vw, 20px) 80px;
+  display: flex;
+  flex-direction: column;
+  gap: 32px;
+}
+
+/* ─── Responsive: History header padding ─────────────────── */
+.history-header {
+  padding: clamp(12px, 2.5vw, 16px) clamp(16px, 4vw, 32px);
+}
+
+/* ─── Responsive: History main container ─────────────────── */
+.history-main {
+  flex: 1;
+  position: relative;
+  z-index: 10;
+  max-width: 840px;
+  width: 100%;
+  margin: 0 auto;
+  padding: clamp(20px, 4vw, 40px) clamp(12px, 3vw, 24px) 80px;
+}
+
+/* ─── Responsive: Auth page layout ───────────────────────── */
+.auth-layout {
+  display: flex;
+  width: 100%;
+  min-height: 100vh;
+}
+.auth-diagram-panel {
+  display: flex;
+}
+@media (max-width: 768px) {
+  .auth-diagram-panel { display: none !important; }
+  .auth-form-panel { width: 100% !important; max-width: 100% !important; }
+}
+
+/* ─── Responsive: Documentation stacked card padding ─────── */
+.doc-stacked-inner {
+  padding: clamp(24px, 4vw, 48px) clamp(16px, 3vw, 40px);
+}
+@media (max-width: 768px) {
+  .doc-card { height: auto !important; }
+  .doc-stacked-inner { gap: 24px !important; }
+}
+
+/* ─── Responsive: Comparing step cards ───────────────────── */
+.comparing-step-container {
+  width: 100%;
+  max-width: min(460px, 90vw);
+}
+
+/* ─── Responsive: Verdict header padding ─────────────────── */
+.verdict-header {
+  padding: clamp(8px, 2vw, 12px) clamp(12px, 3vw, 24px);
 }
 
 /* ─── Sidebar responsiveness ────────────────────────────── */
@@ -408,10 +630,12 @@ body {
   display: grid;
   grid-template-columns: 1fr 300px;
   gap: 24px;
+  align-items: start;
 }
-@media (max-width: 900px) {
+@media (max-width: 768px) {
   .verdict-analysis-row {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
 }
 

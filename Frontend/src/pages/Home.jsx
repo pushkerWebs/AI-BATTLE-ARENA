@@ -24,6 +24,7 @@ function HowStep({ number, icon, title, desc, isLast, delay }) {
       {/* Connector line to next step */}
       {!isLast && (
         <motion.div
+          className="how-step-connector"
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
           transition={{ duration: 0.8, delay: delay + 0.45, ease: 'easeInOut' }}
@@ -90,9 +91,182 @@ function HowStep({ number, icon, title, desc, isLast, delay }) {
   )
 }
 
+// ─── Mobile Hamburger Drawer ─────────────────────────────────────────────────
+const MobileDrawer = React.memo(({ open, onClose, onNavigate, user, logout, theme, toggleTheme }) => {
+  const navItems = [
+    { icon: 'add_box',     label: 'New Comparison',  onClick: () => { onNavigate('home'); onClose() } },
+    { icon: 'history',     label: 'History',          onClick: () => { onNavigate(user ? 'history' : 'auth'); onClose() } },
+    { icon: 'description', label: 'Documentation',    onClick: () => { onNavigate('documentation'); onClose() } },
+    { icon: 'open_in_new', label: 'GitHub',           href: 'https://github.com/pushkerWebs/AI-BATTLE-ARENA' },
+  ]
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            className="mobile-drawer-overlay"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22 }}
+            onClick={onClose}
+          />
+
+          {/* Drawer panel */}
+          <motion.div
+            className="mobile-drawer"
+            initial={{ x: '100%' }}
+            animate={{ x: 0 }}
+            exit={{ x: '100%' }}
+            transition={{ type: 'spring', stiffness: 340, damping: 34 }}
+          >
+            {/* Drawer header */}
+            <div style={{
+              display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+              padding: '20px 20px 16px',
+              borderBottom: `1px solid ${C.outlineV}22`,
+            }}>
+              <span className="logo-brand" style={{ fontSize: 16 }}>AI ARENA</span>
+              <button
+                onClick={onClose}
+                style={{
+                  background: 'none', border: 'none', cursor: 'pointer',
+                  color: C.onSurfVar, display: 'flex', alignItems: 'center',
+                  padding: 4, borderRadius: 6,
+                }}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 22 }}>close</span>
+              </button>
+            </div>
+
+            {/* Nav items */}
+            <nav style={{ flex: 1, padding: '12px 12px', display: 'flex', flexDirection: 'column', gap: 4 }}>
+              {navItems.map((item, i) => (
+                item.href ? (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    onClick={onClose}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 14,
+                      padding: '11px 14px', borderRadius: 8,
+                      color: C.onSurfVar, textDecoration: 'none',
+                      fontFamily: "'Geist Pixel', monospace", fontSize: 12,
+                      transition: 'background 0.15s, color 0.15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = C.surfHigh; e.currentTarget.style.color = C.onSurf }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.onSurfVar }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'inherit' }}>{item.icon}</span>
+                    {item.label}
+                    <span className="material-symbols-outlined" style={{ fontSize: 14, marginLeft: 'auto', opacity: 0.4 }}>open_in_new</span>
+                  </a>
+                ) : (
+                  <button
+                    key={item.label}
+                    onClick={item.onClick}
+                    style={{
+                      display: 'flex', alignItems: 'center', gap: 14,
+                      padding: '11px 14px', borderRadius: 8,
+                      background: 'transparent', border: 'none', cursor: 'pointer',
+                      color: C.onSurfVar, width: '100%', textAlign: 'left',
+                      fontFamily: "'Geist Pixel', monospace", fontSize: 12,
+                      transition: 'background 0.15s, color 0.15s',
+                    }}
+                    onMouseEnter={e => { e.currentTarget.style.background = C.surfHigh; e.currentTarget.style.color = C.onSurf }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.color = C.onSurfVar }}
+                  >
+                    <span className="material-symbols-outlined" style={{ fontSize: 20, color: 'inherit' }}>{item.icon}</span>
+                    {item.label}
+                  </button>
+                )
+              ))}
+
+              {/* Divider */}
+              <div style={{ height: 1, background: `${C.outlineV}22`, margin: '8px 0' }} />
+
+              {/* Theme toggle */}
+              <button
+                onClick={toggleTheme}
+                style={{
+                  display: 'flex', alignItems: 'center', gap: 14,
+                  padding: '11px 14px', borderRadius: 8,
+                  background: 'transparent', border: 'none', cursor: 'pointer',
+                  color: C.onSurfVar, width: '100%', textAlign: 'left',
+                  fontFamily: "'Geist Pixel', monospace", fontSize: 12,
+                  transition: 'background 0.15s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.background = C.surfHigh}
+                onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+              >
+                <span className="material-symbols-outlined" style={{ fontSize: 20 }}>
+                  {theme === 'dark' ? 'light_mode' : 'dark_mode'}
+                </span>
+                {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+              </button>
+            </nav>
+
+            {/* Bottom auth area */}
+            <div style={{ padding: '16px 12px 24px', borderTop: `1px solid ${C.outlineV}22` }}>
+              {user ? (
+                <>
+                  <div style={{
+                    display: 'flex', alignItems: 'center', gap: 10,
+                    padding: '10px 14px', marginBottom: 8,
+                    background: C.surfMid, borderRadius: 8,
+                  }}>
+                    <div style={{
+                      width: 32, height: 32, borderRadius: '50%',
+                      background: C.surfHigh2, border: `1px solid ${C.outlineV}44`,
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                      flexShrink: 0, fontSize: 13, fontWeight: 600, color: C.primary,
+                    }}>
+                      {user.name?.charAt(0).toUpperCase()}
+                    </div>
+                    <div style={{ minWidth: 0 }}>
+                      <div style={{ fontSize: 12, fontWeight: 600, color: C.onSurf, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.name}</div>
+                      <div style={{ fontSize: 10, color: C.onSurfVar, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{user.email}</div>
+                    </div>
+                  </div>
+                  <button
+                    onClick={() => { logout(); onClose() }}
+                    style={{
+                      width: '100%', padding: '10px 14px', borderRadius: 8,
+                      background: 'rgba(248,113,113,0.08)', border: '1px solid rgba(248,113,113,0.2)',
+                      color: '#f87171', fontFamily: "'Geist Pixel', monospace",
+                      fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                    }}
+                  >Sign Out</button>
+                </>
+              ) : (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  <button
+                    onClick={() => { onNavigate('auth'); onClose() }}
+                    style={{
+                      width: '100%', padding: '10px 14px', borderRadius: 8,
+                      background: C.primary, border: 'none',
+                      color: C.onPrimary, fontFamily: "'Geist Pixel', monospace",
+                      fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                    }}
+                  >Sign In / Register</button>
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  )
+})
+
 // ─── Header (React.memo to isolate profile toggles and navbar rendering) ─────
 const Header = React.memo(({ onNavigate }) => {
   const [profileOpen, setProfileOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
   const { user, logout } = useAuth()
   const { theme, toggleTheme } = useTheme()
   const shouldReduceMotion = useReducedMotion()
@@ -106,239 +280,214 @@ const Header = React.memo(({ onNavigate }) => {
   })
 
   return (
-    <motion.header
-      initial={(hasAnimated || shouldReduceMotion) ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, ease: 'easeOut' }}
-      style={{
-        position: 'sticky', top: 0, zIndex: 50,
-        display: 'flex', justifyContent: 'space-between', alignItems: 'center',
-        padding: '24px 24px 12px',
-        maxWidth: 1280, margin: '0 auto', width: '100%',
-        background: 'transparent',
-        borderBottom: 'none',
-        boxShadow: 'none',
-      }}
-    >
-      {/* Logo */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-        <span
-          className="logo-brand"
-          onClick={() => onNavigate('home')}
-          style={{ fontSize: 20, cursor: 'pointer' }}
-        >
-          AI ARENA
-        </span>
-      </div>
+    <>
+      <MobileDrawer
+        open={drawerOpen}
+        onClose={() => setDrawerOpen(false)}
+        onNavigate={onNavigate}
+        user={user}
+        logout={logout}
+        theme={theme}
+        toggleTheme={toggleTheme}
+      />
 
-      {/* Nav links (Static rendering to avoid layout shifts) */}
-      <nav
-        className="navbar-pill"
+      <motion.header
+        initial={(hasAnimated || shouldReduceMotion) ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5, ease: 'easeOut' }}
         style={{
-          position: 'absolute',
-          left: '50%',
-          transform: 'translateX(-50%)',
-          display: 'flex',
-          alignItems: 'center',
-          gap: 20,
-          borderRadius: 8,
-          padding: '8px 24px',
+          position: 'sticky', top: 0, zIndex: 50,
+          display: 'flex', justifyContent: 'space-between', alignItems: 'center',
+          padding: 'clamp(12px, 3vw, 24px) clamp(16px, 3vw, 24px) clamp(8px, 1.5vw, 12px)',
+          maxWidth: 1280, margin: '0 auto', width: '100%',
+          background: 'transparent',
+          borderBottom: 'none',
+          boxShadow: 'none',
         }}
       >
-        {[
-          { label: 'Documentation', onClick: () => onNavigate('documentation') },
-          { label: 'History', onClick: () => onNavigate(user ? 'history' : 'auth') },
-          { label: 'GitHub', href: 'https://github.com/pushkerWebs' },
-        ].map((item) => (
-          <a
-            key={item.label}
-            href={item.href || '#'}
-            onClick={item.onClick}
-            target={item.href && item.href.startsWith('http') ? '_blank' : undefined}
-            rel={item.href && item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
-            style={{
-              fontFamily: "'Helvetica', Arial, sans-serif",
-              fontSize: 13, fontWeight: 500, letterSpacing: '0.01em',
-              color: C.onSurfVar, textDecoration: 'none', transition: 'color 0.2s',
-              cursor: 'pointer', background: 'none', border: 'none',
-              padding: '4px 8px',
-            }}
-            onMouseEnter={e => e.currentTarget.style.color = C.primary}
-            onMouseLeave={e => e.currentTarget.style.color = C.onSurfVar}
-          >{item.label}</a>
-        ))}
-      </nav>
+        {/* Logo */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+          <span
+            className="logo-brand"
+            onClick={() => onNavigate('home')}
+            style={{ fontSize: 20, cursor: 'pointer' }}
+          >
+            AI ARENA
+          </span>
+        </div>
 
-      {/* Profile / Auth buttons */}
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        {/* Theme toggle */}
-        <motion.button
-          onClick={toggleTheme}
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+        {/* Nav links (Static rendering to avoid layout shifts) */}
+        <nav
+          className="navbar-pill"
           style={{
-            background: 'transparent',
-            border: `1px solid ${C.outlineV}44`,
-            borderRadius: 8,
-            width: 32,
-            height: 32,
+            position: 'absolute',
+            left: '50%',
+            transform: 'translateX(-50%)',
             display: 'flex',
             alignItems: 'center',
-            justifyContent: 'center',
-            cursor: 'pointer',
-            color: C.onSurfVar,
-            padding: 0,
-            transition: 'all 0.2s',
+            gap: 20,
+            borderRadius: 8,
+            padding: '8px 24px',
           }}
         >
-          <Icon n={theme === 'dark' ? 'light_mode' : 'dark_mode'} size={16} />
-        </motion.button>
-
-        <div style={{ width: 1, height: 24, background: `${C.outlineV}33`, margin: '0 4px' }} />
-        {user ? (
-          <div style={{ position: 'relative' }}>
-            {/* Click outside overlay */}
-            {profileOpen && (
-              <div
-                onClick={() => setProfileOpen(false)}
-                style={{ position: 'fixed', inset: 0, zIndex: 90, cursor: 'default' }}
-              />
-            )}
-
-            {/* Avatar circle */}
-            <Avatar
-              user={user}
-              size={36}
-              onClick={() => setProfileOpen(!profileOpen)}
+          {[
+            { label: 'Documentation', onClick: () => onNavigate('documentation') },
+            { label: 'History', onClick: () => onNavigate(user ? 'history' : 'auth') },
+            { label: 'GitHub', href: 'https://github.com/pushkerWebs/AI-BATTLE-ARENA' },
+          ].map((item) => (
+            <a
+              key={item.label}
+              href={item.href || '#'}
+              onClick={item.onClick}
+              target={item.href && item.href.startsWith('http') ? '_blank' : undefined}
+              rel={item.href && item.href.startsWith('http') ? 'noopener noreferrer' : undefined}
               style={{
-                cursor: 'pointer',
-                border: `1.5px solid ${C.outlineV}aa`,
-                boxShadow: `0 0 10px ${C.primary}22`,
-                zIndex: 95,
-                position: 'relative',
-              }}
-            />
-
-            {/* Dropdown Menu */}
-            <AnimatePresence>
-              {profileOpen && (
-                <motion.div
-                  initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                  animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: 10, scale: 0.95 }}
-                  transition={{ duration: 0.15 }}
-                  style={{
-                    position: 'absolute',
-                    top: '100%',
-                    right: 0,
-                    marginTop: 12,
-                    width: 220,
-                    background: `${C.surface}f2`,
-                    backdropFilter: 'blur(20px)',
-                    border: `1px solid ${C.outlineV}33`,
-                    borderRadius: 12,
-                    padding: '12px 8px',
-                    boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    gap: 8,
-                    zIndex: 100,
-                  }}
-                >
-                  {/* User Stats Card */}
-                  <div style={{ padding: '8px 12px', borderBottom: `1px solid ${C.outlineV}22`, marginBottom: 4 }}>
-                    <div style={{ fontWeight: 600, color: C.onSurf, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
-                    <div style={{ color: C.onSurfVar, fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>{user.email}</div>
-                  </div>
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 12px' }}>
-                    <span style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 10, color: C.onSurfVar }}>Battles run</span>
-                    <span style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, fontWeight: 700, color: C.primary }}>{user.battleCount || 0}</span>
-                  </div>
-
-                  <button
-                    onClick={() => {
-                      setProfileOpen(false)
-                      onNavigate('history')
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      background: 'rgba(255,255,255,0.05)',
-                      border: `1px solid ${C.outlineV}33`,
-                      borderRadius: 8,
-                      color: C.onSurf,
-                      fontFamily: "'Geist Pixel', monospace",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      textAlign: 'center',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
-                  >
-                    Battle History
-                  </button>
-
-                  <button
-                    onClick={() => {
-                      setProfileOpen(false)
-                      logout()
-                    }}
-                    style={{
-                      width: '100%',
-                      padding: '8px 12px',
-                      background: 'rgba(248,113,113,0.1)',
-                      border: '1px solid rgba(248,113,113,0.25)',
-                      borderRadius: 8,
-                      color: '#f87171',
-                      fontFamily: "'Geist Pixel', monospace",
-                      fontSize: 11,
-                      fontWeight: 600,
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      textAlign: 'center',
-                    }}
-                    onMouseEnter={e => e.currentTarget.style.background = 'rgba(248,113,113,0.18)'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'rgba(248,113,113,0.1)'}
-                  >
-                    Sign Out
-                  </button>
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </div>
-        ) : (
-          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-            <button
-              onClick={() => onNavigate('auth')}
-              style={{
-                background: 'transparent', color: C.onSurfVar,
-                padding: '8px 12px', border: 'none',
-                fontFamily: "'Geist Pixel', monospace",
-                fontSize: 11, fontWeight: 500, cursor: 'pointer',
-                transition: 'color 0.2s',
+                fontFamily: "'Helvetica', Arial, sans-serif",
+                fontSize: 13, fontWeight: 500, letterSpacing: '0.01em',
+                color: C.onSurfVar, textDecoration: 'none', transition: 'color 0.2s',
+                cursor: 'pointer', background: 'none', border: 'none',
+                padding: '4px 8px',
               }}
               onMouseEnter={e => e.currentTarget.style.color = C.primary}
               onMouseLeave={e => e.currentTarget.style.color = C.onSurfVar}
-            >Sign In</button>
-            <motion.button
-              whileHover={{ scale: 1.04, boxShadow: `0 0 16px ${C.primary}33` }}
-              whileTap={{ scale: 0.97 }}
-              onClick={() => onNavigate('auth')}
-              style={{
-                background: C.primary, color: C.onPrimary,
-                padding: '8px 14px', border: 'none', borderRadius: 6,
-                fontFamily: "'Geist Pixel', monospace",
-                fontSize: 11, fontWeight: 600, cursor: 'pointer',
-              }}
-            >Register</motion.button>
-          </div>
-        )}
-      </div>
-    </motion.header>
+            >{item.label}</a>
+          ))}
+        </nav>
+
+        {/* Right side: desktop auth + hamburger */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+          {/* Theme toggle — desktop */}
+          <motion.button
+            onClick={toggleTheme}
+            whileHover={{ scale: 1.1 }}
+            whileTap={{ scale: 0.9 }}
+            title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            className="desktop-auth"
+            style={{
+              background: 'transparent',
+              border: `1px solid ${C.outlineV}44`,
+              borderRadius: 8,
+              width: 32, height: 32,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              cursor: 'pointer',
+              color: C.onSurfVar,
+              padding: 0,
+              transition: 'all 0.2s',
+            }}
+          >
+            <Icon n={theme === 'dark' ? 'light_mode' : 'dark_mode'} size={16} />
+          </motion.button>
+
+          <div className="desktop-auth" style={{ width: 1, height: 24, background: `${C.outlineV}33`, margin: '0 4px' }} />
+
+          {/* Desktop profile / auth buttons */}
+          {user ? (
+            <div className="desktop-auth" style={{ position: 'relative' }}>
+              {profileOpen && (
+                <div
+                  onClick={() => setProfileOpen(false)}
+                  style={{ position: 'fixed', inset: 0, zIndex: 90, cursor: 'default' }}
+                />
+              )}
+              <Avatar
+                user={user}
+                size={36}
+                onClick={() => setProfileOpen(!profileOpen)}
+                style={{
+                  cursor: 'pointer',
+                  border: `1.5px solid ${C.outlineV}aa`,
+                  boxShadow: `0 0 10px ${C.primary}22`,
+                  zIndex: 95, position: 'relative',
+                }}
+              />
+              <AnimatePresence>
+                {profileOpen && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 10, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: 10, scale: 0.95 }}
+                    transition={{ duration: 0.15 }}
+                    style={{
+                      position: 'absolute', top: '100%', right: 0, marginTop: 12,
+                      width: 220, background: `${C.surface}f2`, backdropFilter: 'blur(20px)',
+                      border: `1px solid ${C.outlineV}33`, borderRadius: 12,
+                      padding: '12px 8px', boxShadow: '0 12px 32px rgba(0,0,0,0.3)',
+                      display: 'flex', flexDirection: 'column', gap: 8, zIndex: 100,
+                    }}
+                  >
+                    <div style={{ padding: '8px 12px', borderBottom: `1px solid ${C.outlineV}22`, marginBottom: 4 }}>
+                      <div style={{ fontWeight: 600, color: C.onSurf, fontSize: 13, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{user.name}</div>
+                      <div style={{ color: C.onSurfVar, fontSize: 11, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', marginTop: 2 }}>{user.email}</div>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 12px' }}>
+                      <span style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 10, color: C.onSurfVar }}>Battles run</span>
+                      <span style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, fontWeight: 700, color: C.primary }}>{user.battleCount || 0}</span>
+                    </div>
+                    <button
+                      onClick={() => { setProfileOpen(false); onNavigate('history') }}
+                      style={{
+                        width: '100%', padding: '8px 12px', background: 'rgba(255,255,255,0.05)',
+                        border: `1px solid ${C.outlineV}33`, borderRadius: 8, color: C.onSurf,
+                        fontFamily: "'Geist Pixel', monospace", fontSize: 11, fontWeight: 600,
+                        cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(255,255,255,0.1)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(255,255,255,0.05)'}
+                    >Battle History</button>
+                    <button
+                      onClick={() => { setProfileOpen(false); logout() }}
+                      style={{
+                        width: '100%', padding: '8px 12px', background: 'rgba(248,113,113,0.1)',
+                        border: '1px solid rgba(248,113,113,0.25)', borderRadius: 8, color: '#f87171',
+                        fontFamily: "'Geist Pixel', monospace", fontSize: 11, fontWeight: 600,
+                        cursor: 'pointer', transition: 'all 0.2s', textAlign: 'center',
+                      }}
+                      onMouseEnter={e => e.currentTarget.style.background = 'rgba(248,113,113,0.18)'}
+                      onMouseLeave={e => e.currentTarget.style.background = 'rgba(248,113,113,0.1)'}
+                    >Sign Out</button>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          ) : (
+            <div className="desktop-auth" style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+              <button
+                onClick={() => onNavigate('auth')}
+                style={{
+                  background: 'transparent', color: C.onSurfVar,
+                  padding: '8px 12px', border: 'none',
+                  fontFamily: "'Geist Pixel', monospace",
+                  fontSize: 11, fontWeight: 500, cursor: 'pointer',
+                  transition: 'color 0.2s',
+                }}
+                onMouseEnter={e => e.currentTarget.style.color = C.primary}
+                onMouseLeave={e => e.currentTarget.style.color = C.onSurfVar}
+              >Sign In</button>
+              <motion.button
+                whileHover={{ scale: 1.04, boxShadow: `0 0 16px ${C.primary}33` }}
+                whileTap={{ scale: 0.97 }}
+                onClick={() => onNavigate('auth')}
+                style={{
+                  background: C.primary, color: C.onPrimary,
+                  padding: '8px 14px', border: 'none', borderRadius: 6,
+                  fontFamily: "'Geist Pixel', monospace",
+                  fontSize: 11, fontWeight: 600, cursor: 'pointer',
+                }}
+              >Register</motion.button>
+            </div>
+          )}
+
+          {/* Hamburger — mobile only */}
+          <button
+            className="hamburger-btn"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="Open menu"
+          >
+            <span className="material-symbols-outlined" style={{ fontSize: 22 }}>menu</span>
+          </button>
+        </div>
+      </motion.header>
+    </>
   )
 })
 
@@ -349,13 +498,7 @@ const ModelSelectors = React.memo(({
   judgeModel, setJudgeModel
 }) => {
   return (
-    <div
-      style={{
-        width: '100%', maxWidth: 720,
-        display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: 16,
-        marginBottom: 20, textAlign: 'left',
-      }}
-    >
+    <div className="model-selectors-grid">
       {/* Model 1 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <label style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, color: C.onSurfVar, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Model 1 (Contestant)</label>
@@ -631,7 +774,7 @@ const HowItWorks = React.memo(() => {
       </div>
 
       {/* Steps row */}
-      <div style={{ display: 'flex', gap: 0, alignItems: 'flex-start', position: 'relative' }}>
+      <div className="how-steps-row">
         {howItWorksSteps.map((step, i) => (
           <HowStep
             key={step.number}
@@ -688,43 +831,8 @@ const BackgroundLayer = React.memo(() => {
   )
 })
 
-// ─── Footer (React.memo to isolate mobile bottom bar from Home re-renders) ─────
-const Footer = React.memo(({ onNavigate }) => {
-  const { user } = useAuth()
-
-  return (
-    <footer id="mobile-nav" style={{
-      position: 'fixed', bottom: 0, left: 0, right: 0,
-      display: 'none', justifyContent: 'space-around', alignItems: 'center',
-      padding: '8px 16px 12px',
-      background: `${C.surfHigh2}e6`, backdropFilter: 'blur(20px)',
-      borderTop: `1px solid ${C.outlineV}33`, borderRadius: '16px 16px 0 0',
-      zIndex: 50,
-    }}>
-      {[
-        { icon: 'add_circle', label: 'New', onClick: () => document.getElementById('mainPrompt')?.focus() },
-        { icon: 'history', label: 'History', onClick: () => onNavigate(user ? 'history' : 'auth') },
-        { icon: 'star', label: 'Favs', onClick: () => { } },
-        { icon: 'menu', label: 'Menu', onClick: () => { } }
-      ].map((item, i) => (
-        <button
-          key={item.label}
-          onClick={item.onClick}
-          style={{
-            display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 2,
-            padding: '8px 16px', borderRadius: 12, border: 'none', cursor: 'pointer',
-            background: i === 0 ? C.primary : 'transparent',
-            color: i === 0 ? C.onPrimary : C.onSurfVar,
-            fontFamily: "'Geist Pixel', monospace", fontSize: 11,
-          }}
-        >
-          <Icon n={item.icon} size={22} style={{ color: 'inherit' }} />
-          {item.label}
-        </button>
-      ))}
-    </footer>
-  )
-})
+// ─── Footer (no longer used — mobile nav replaced by hamburger) ───────────────
+// (bottom nav bar removed)
 
 // ─── Main Home component (Pure Layout Wrapper — no direct Context subscriptions) ──
 export default function Home({
@@ -776,12 +884,12 @@ export default function Home({
       )}
 
       {/* ── Main ── */}
-      <main style={{ position: 'relative', zIndex: 10, maxWidth: 1280, margin: '0 auto', padding: '0 48px' }}>
+      <main className="home-main" style={{ position: 'relative', zIndex: 10, maxWidth: 1280, margin: '0 auto' }}>
 
         {/* ── Hero Section (Statically rendered above-the-fold elements) ── */}
-        <section style={{
+        <section className="hero-section" style={{
           display: 'flex', flexDirection: 'column', alignItems: 'center',
-          textAlign: 'center', paddingTop: 80, paddingBottom: 64,
+          textAlign: 'center',
         }}>
 
           {/* H1 Title (CSS Custom Property color mapping) */}
@@ -835,10 +943,7 @@ export default function Home({
         <HowItWorks />
       </main>
 
-      {/* ── Mobile Bottom Nav (Isolated authentication layout state) ── */}
-      <Footer
-        onNavigate={onNavigate}
-      />
+      {/* ── Mobile Bottom Nav removed — hamburger in header handles mobile nav ── */}
     </div>
   )
 }

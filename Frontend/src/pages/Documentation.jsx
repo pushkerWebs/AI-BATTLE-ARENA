@@ -29,7 +29,7 @@ function StackedCard({ step, title, desc, index, total, children }) {
           background: `${C.surface}f2`,
           backdropFilter: 'blur(30px)',
           border: `1px solid ${C.outlineV}28`,
-          padding: '48px 40px',
+          padding: 'clamp(24px, 4vw, 48px) clamp(16px, 3vw, 40px)',
           boxShadow: '0 30px 60px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255,255,255,0.05)',
           display: 'flex',
           flexDirection: 'column',
@@ -145,7 +145,7 @@ export default function Documentation({ onNavigate }) {
             display: 'flex',
             justifyContent: 'space-between',
             alignItems: 'center',
-            padding: '12px 24px',
+            padding: 'clamp(10px, 2vw, 12px) clamp(16px, 3vw, 24px)',
             background: C.bg,
             borderBottom: 'none',
             boxShadow: 'none',
@@ -212,7 +212,7 @@ export default function Documentation({ onNavigate }) {
         </motion.header>
 
         {/* Content Wrapper */}
-        <main style={{ maxWidth: 840, width: '100%', margin: '0 auto', padding: '64px 24px 80px', display: 'flex', flexDirection: 'column' }}>
+        <main style={{ maxWidth: 840, width: '100%', margin: '0 auto', padding: 'clamp(32px, 5vw, 64px) clamp(16px, 3vw, 24px) 80px', display: 'flex', flexDirection: 'column' }}>
 
           {/* Breadcrumbs & Hero Header */}
           <motion.div

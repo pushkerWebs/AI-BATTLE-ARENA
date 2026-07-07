@@ -115,10 +115,10 @@ export default function History({ onNavigate, onSelectBattle }) {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
+        className="history-header"
         style={{
           position: 'sticky', top: 0, zIndex: 50,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '16px 32px',
           background: C.bg,
           borderBottom: 'none',
           boxShadow: 'none',
@@ -154,7 +154,7 @@ export default function History({ onNavigate, onSelectBattle }) {
       </motion.header>
 
       {/* Main Container */}
-      <div style={{ flex: 1, position: 'relative', zIndex: 10, maxWidth: 840, width: '100%', margin: '0 auto', padding: '40px 24px 80px' }}>
+      <div className="history-main">
 
         {/* Search header */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32, gap: 16, flexWrap: 'wrap' }}>

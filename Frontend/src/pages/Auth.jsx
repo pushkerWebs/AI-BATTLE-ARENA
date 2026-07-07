@@ -394,7 +394,7 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
   }
 
   return (
-    <div style={{
+    <div className="auth-layout" style={{
       position: 'relative',
       minHeight: '100vh',
       background: '#09090b',
@@ -422,7 +422,7 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
         padding: '40px 60px',
         justifyContent: 'space-between',
         boxSizing: 'border-box',
-      }} className="auth-left-visuals">
+      }} className="auth-diagram-panel">
         {/* Back Link */}
         <button
           onClick={() => onNavigate('home')}
@@ -481,7 +481,7 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
         zIndex: 1,
         background: '#09090b',
         boxSizing: 'border-box',
-      }} className="auth-right-form">
+      }} className="auth-right-form auth-form-panel">
 
         <motion.div
           animate={shake ? { x: [-6, 6, -4, 4, -2, 2, 0] } : {}}

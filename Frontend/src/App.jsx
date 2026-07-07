@@ -25,17 +25,26 @@ function AppInner() {
 
   // ── Lenis smooth scroll ──────────────────────────────────
   useEffect(() => {
+    // Ensure we always start at the top on mount (backup for scroll restoration)
+    window.scrollTo(0, 0)
+
     const lenis = new Lenis({
       lerp: 0.08,          // lower = slower / smoother glide
       smoothWheel: true,
       wheelMultiplier: 0.8,
     })
+
+    let rafId
     function raf(time) {
       lenis.raf(time)
-      requestAnimationFrame(raf)
+      rafId = requestAnimationFrame(raf)
     }
-    requestAnimationFrame(raf)
-    return () => lenis.destroy()
+    rafId = requestAnimationFrame(raf)
+
+    return () => {
+      cancelAnimationFrame(rafId)
+      lenis.destroy()
+    }
   }, [])
 
   const [model1, setModel1] = useState('mistral-medium-latest')
