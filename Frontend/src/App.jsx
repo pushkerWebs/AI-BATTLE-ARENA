@@ -60,7 +60,31 @@ function AppInner() {
 
   const handleDone = useCallback((apiResult) => {
     if (apiResult?.error) {
-      setError(apiResult.error)
+      const details = apiResult.details || ''
+      const lowerDetails = details.toLowerCase()
+      const lowerError = apiResult.error.toLowerCase()
+
+      let finalMessage = apiResult.error
+
+      // Detect API quota, rate limits, or exhausted resources
+      if (
+        lowerDetails.includes('quota') ||
+        lowerDetails.includes('limit') ||
+        lowerDetails.includes('exhausted') ||
+        lowerDetails.includes('429') ||
+        lowerDetails.includes('too many requests') ||
+        lowerError.includes('quota') ||
+        lowerError.includes('limit') ||
+        lowerError.includes('exhausted') ||
+        lowerError.includes('429') ||
+        lowerError.includes('too many requests')
+      ) {
+        finalMessage = 'Model Limit Exceeded: One of the selected AI models has exceeded its request limits or free quota. Please select a different model and try again.'
+      } else if (apiResult.details) {
+        finalMessage = `${apiResult.error}: ${apiResult.details}`
+      }
+
+      setError(finalMessage)
       setView('home')
     } else {
       setResult(apiResult)
