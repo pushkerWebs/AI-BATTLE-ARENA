@@ -507,6 +507,7 @@ const ModelSelectors = React.memo(({
             <option value="mistral-medium-latest">Mistral Medium</option>
             <option value="mistral-large-latest">Mistral Large</option>
             <option value="open-mixtral-8x22b">Mixtral 8x22B</option>
+            <option value="mistral-small-latest">Mistral Small</option>
           </optgroup>
           <optgroup label="Cohere">
             <option value="command-a-03-2025">Command A (Latest)</option>
@@ -533,6 +534,7 @@ const ModelSelectors = React.memo(({
             <option value="mistral-medium-latest">Mistral Medium</option>
             <option value="mistral-large-latest">Mistral Large</option>
             <option value="open-mixtral-8x22b">Mixtral 8x22B</option>
+            <option value="mistral-small-latest">Mistral Small</option>
           </optgroup>
           <optgroup label="Google Gemini">
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
@@ -557,6 +559,7 @@ const ModelSelectors = React.memo(({
             <option value="mistral-large-latest">Mistral Large</option>
             <option value="mistral-medium-latest">Mistral Medium</option>
             <option value="open-mixtral-8x22b">Mixtral 8x22B</option>
+            <option value="mistral-small-latest">Mistral Small</option>
           </optgroup>
           <optgroup label="Cohere">
             <option value="command-a-03-2025">Command A (Latest)</option>

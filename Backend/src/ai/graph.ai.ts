@@ -28,6 +28,7 @@ function getModelName(modelId: string): string {
     'mistral-medium-latest': 'Mistral Medium',
     'mistral-large-latest': 'Mistral Large',
     'open-mixtral-8x22b': 'Mixtral 8x22B',
+    'mistral-small-latest': 'Mistral Small',
     'command-a-03-2025': 'Cohere Command R+',
     'command-r': 'Cohere Command R',
     'command-light': 'Cohere Command Light',
