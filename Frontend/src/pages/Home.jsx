@@ -514,8 +514,6 @@ const ModelSelectors = React.memo(({
           </optgroup>
           <optgroup label="Google Gemini">
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
           </optgroup>
         </select>
       </div>
@@ -535,8 +533,6 @@ const ModelSelectors = React.memo(({
           </optgroup>
           <optgroup label="Google Gemini">
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
           </optgroup>
         </select>
       </div>
@@ -547,8 +543,6 @@ const ModelSelectors = React.memo(({
         <select value={judgeModel} onChange={e => setJudgeModel(e.target.value)} style={{ background: C.surfLow, color: C.onSurf, border: `1px solid ${C.outlineV}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, fontFamily: "'Geist Pixel', monospace", outline: 'none', cursor: 'pointer' }}>
           <optgroup label="Google Gemini">
             <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
-            <option value="gemini-2.5-pro">Gemini 2.5 Pro</option>
-            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
           </optgroup>
           <optgroup label="Mistral AI">
             <option value="mistral-large-latest">Mistral Large</option>
