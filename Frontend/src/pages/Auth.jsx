@@ -325,7 +325,7 @@ export default function Auth({ onNavigate, defaultTab = 'login' }) {
     if (typeof google !== 'undefined') {
       try {
         google.accounts.id.initialize({
-          client_id: '783146405875-ruj7u1898mjonc7qpnkvmsk5kofcv9ti.apps.googleusercontent.com',
+          client_id: import.meta.env.VITE_GOOGLE_CLIENT_ID,
           callback: handleGoogleLogin,
         })
         const btnContainer = document.getElementById('google-signin-btn')
