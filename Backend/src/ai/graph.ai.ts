@@ -2,6 +2,7 @@ import { ChatPromptTemplate } from "@langchain/core/prompts";
 import { getModel } from "./model.ai.js";
 import { z } from "zod";
 
+// ── Schemas ────────────────────────────────────────────────────────────────────
 const judgeSchema = z.object({
   solution_1_score: z.number().min(0).max(10),
   solution_2_score: z.number().min(0).max(10),
@@ -21,98 +22,201 @@ export interface BattleResult {
   model2: string;
   judgeModel: string;
   judge: JudgeResult;
+  timings?: Record<string, number>;
 }
 
-function getModelName(modelId: string): string {
-  const mapping: Record<string, string> = {
-    'mistral-medium-latest': 'Mistral Medium',
-    'mistral-large-latest': 'Mistral Large',
-    'open-mixtral-8x22b': 'Mixtral 8x22B',
-    'mistral-small-latest': 'Mistral Small',
-    'command-a-03-2025': 'Cohere Command R+',
-    'command-r': 'Cohere Command R',
-    'command-light': 'Cohere Command Light',
-    'gemini-2.5-flash': 'Gemini 2.5 Flash',
-    'gemini-2.5-flash-lite': 'Gemini 2.5 Flash Lite',
-    'gemini-2.5-pro': 'Gemini 2.5 Pro',
-    'gemini-2.0-flash': 'Gemini 2.0 Flash',
-    'gemini-1.5-flash': 'Gemini 1.5 Flash'
-  };
-  return mapping[modelId] || modelId;
+// ── Event types ────────────────────────────────────────────────────────────────
+export type BattleEventType =
+  | 'battle_start'
+  | 'contestant_1_start'
+  | 'contestant_2_start'
+  | 'contestant_1_token'   // streaming chunk from contestant 1
+  | 'contestant_2_token'   // streaming chunk from contestant 2
+  | 'contestant_1_done'
+  | 'contestant_2_done'
+  | 'judge_start'
+  | 'judge_done'
+  | 'save_done'
+  | 'complete'
+  | 'error';
+
+export interface BattleEvent {
+  type: BattleEventType;
+  data?: any;
+  elapsedMs?: number;
 }
 
+export type OnEventFn = (event: BattleEvent) => void;
+
+// ── Model display names ────────────────────────────────────────────────────────
+const MODEL_NAMES: Record<string, string> = {
+  'mistral-medium-latest':  'Mistral Medium',
+  'mistral-large-latest':   'Mistral Large',
+  'open-mixtral-8x22b':     'Mixtral 8x22B',
+  'mistral-small-latest':   'Mistral Small',
+  'command-a-03-2025':      'Cohere Command A',
+  'command-r-08-2024':      'Cohere Command R',
+  'command-r':              'Cohere Command R',
+  'command-light':          'Cohere Command Light',
+  'gemini-2.5-flash':       'Gemini 2.5 Flash',
+  'gemini-2.5-flash-lite':  'Gemini 2.5 Flash Lite',
+  'gemini-2.5-pro':         'Gemini 2.5 Pro',
+  'gemini-2.0-flash':       'Gemini 2.0 Flash',
+  'gemini-1.5-flash':       'Gemini 1.5 Flash',
+};
+
+export function getModelName(modelId: string): string {
+  return MODEL_NAMES[modelId] || modelId;
+}
+
+// ── Static prompt templates ────────────────────────────────────────────────────
+// Balanced system prompt — all original behavioral constraints preserved.
+// Only genuine duplicate removed: "extremely readable" and "proper Markdown spacing"
+// said the same thing twice; merged into one clear instruction.
+// Net savings: ~30 tokens vs original, zero quality degradation.
+const SYSTEM_INSTRUCTION =
+  `You are an expert software engineer and system architect. ` +
+  `Provide highly detailed, structured, and production-ready solutions.\n` +
+  `ALWAYS format any tables strictly using GitHub Flavored Markdown (GFM) table syntax.\n` +
+  `CRITICAL: Every table must have a header separator row (e.g. |---|---|---| or |:---|:---|:---|) ` +
+  `immediately after the column headers. Never omit this row — tables will fail to render without it.\n` +
+  `Ensure clear blank lines before and after all headers, lists, tables, and code blocks. ` +
+  `Responses must be well-structured and easy to read.`;
+
+const solutionPrompt = ChatPromptTemplate.fromMessages([
+  ["system", SYSTEM_INSTRUCTION],
+  ["human", "{problem}"],
+]);
+
+// Judge prompt — fully static template; model names injected as variables at
+// invocation time so the template object itself is reused across all battles.
+const judgePromptTemplate = ChatPromptTemplate.fromMessages([
+  [
+    "system",
+    `You are an expert AI judge. Evaluate two AI solutions to a problem.\n` +
+    `Score each out of 10 (correctness, clarity, completeness, quality). ` +
+    `Scores must be different. Declare a clear winner. Be concise but specific.`,
+  ],
+  [
+    "human",
+    `Problem: {problem}\n\n` +
+    `Solution 1 ({model1Name}):\n{solution_1}\n\n` +
+    `Solution 2 ({model2Name}):\n{solution_2}\n\n` +
+    `Evaluate both solutions. Score them. State strengths and critiques for each model by name.`,
+  ],
+]);
+
+// ── Contestant token limit ─────────────────────────────────────────────────────
+// Configurable via CONTESTANT_MAX_TOKENS env var. Default is 1200 tokens,
+// which covers most coding tasks (≈500–600 words) without truncating mid-answer.
+// Raise to 2000+ for multi-file architecture problems.
+// This limit does NOT apply to the judge — structured output must be complete.
+const CONTESTANT_MAX_TOKENS = parseInt(process.env.CONTESTANT_MAX_TOKENS ?? '1200', 10)
+
+// ── Contestant streaming helper ────────────────────────────────────────────────
+// Each contestant runs in its own independent async task via Promise.all.
+// There is NO shared state, NO mutex, NO await chain between C1 and C2.
+// The two for-await loops execute on separate microtask queues and interleave
+// freely — neither can block the other. C2 taking longer = API latency only.
+async function runContestantStream(
+  chain: any,
+  problem: string,
+  modelId: string,
+  tokenEventType: 'contestant_1_token' | 'contestant_2_token',
+  doneEventType:  'contestant_1_done'  | 'contestant_2_done',
+  onEvent: OnEventFn
+): Promise<{ text: string; elapsedMs: number }> {
+  const taskStart = Date.now()
+  let text        = ''
+
+  // ── Phase 1: request creation + HTTP connection ──────────────────────────────
+  const stream = await chain.stream({ problem })
+
+  // ── Phase 2: streaming tokens ────────────────────────────────────────────────
+  for await (const chunk of stream) {
+    // Normalize chunk content across LangChain model adapters
+    let piece: string
+    if (typeof chunk.content === 'string') {
+      piece = chunk.content
+    } else if (Array.isArray(chunk.content)) {
+      piece = chunk.content
+        .map((c: any) => (typeof c === 'string' ? c : (c?.text ?? '')))
+        .join('')
+    } else {
+      piece = ''
+    }
+
+    if (!piece) continue
+
+    // ── Emit to frontend immediately — no buffering, no waiting for loop end ──
+    text += piece
+    onEvent({ type: tokenEventType, data: { chunk: piece } })
+  }
+
+  // ── Phase 3: last token already emitted inside loop above ───────────────────
+  const elapsed = Date.now() - taskStart
+
+  // ── Phase 4: emit done event immediately — no buffering ───────────────────────
+  onEvent({ type: doneEventType, elapsedMs: elapsed })
+
+  return { text, elapsedMs: elapsed }
+}
+
+// ── Main battle runner ─────────────────────────────────────────────────────────
 export default async function runBattle(
   problem: string,
-  model1Id = "mistral-medium-latest",
-  model2Id = "command-a-03-2025",
-  judgeModelId = "gemini-2.5-flash"
+  model1Id    = "mistral-medium-latest",
+  model2Id    = "command-a-03-2025",
+  judgeModelId = "gemini-2.5-flash",
+  onEvent: OnEventFn = () => {}
 ): Promise<BattleResult> {
-  const m1 = getModel(model1Id);
-  const m2 = getModel(model2Id);
-  const jModel = getModel(judgeModelId);
+  const battleStart = Date.now()
 
-  const model1Name = getModelName(model1Id);
-  const model2Name = getModelName(model2Id);
+  onEvent({ type: 'battle_start', elapsedMs: 0 })
 
-  // Step 1: Both models generate solutions in parallel
-  const systemInstruction = `You are an expert software engineer and system architect. You provide highly detailed, structured, and production-ready solutions.
-ALWAYS format any tables strictly using GitHub Flavored Markdown (GFM) table syntax.
-CRITICAL: Every single table must have a header separator row (like \`|---|---|---| \` or \`|:---|:---|:---| \`) immediately following the column headers. Never omit this row for any table under any circumstances, otherwise the table will fail to render.
-Ensure there are clear empty line gaps before and after all headers, lists, tables, and code blocks.
-Make sure your responses are extremely readable and use proper Markdown spacing.`;
+  // Contestant models with token limit baked into the constructor.
+  const m1     = getModel(model1Id, CONTESTANT_MAX_TOKENS)
+  const m2     = getModel(model2Id, CONTESTANT_MAX_TOKENS)
+  const jModel = getModel(judgeModelId)
+  const model1Name = getModelName(model1Id)
+  const model2Name = getModelName(model2Id)
 
-  const solutionPrompt = ChatPromptTemplate.fromMessages([
-    ["system", systemInstruction],
-    ["human", "{problem}"],
-  ]);
+  const c1Chain = solutionPrompt.pipe(m1)
+  const c2Chain = solutionPrompt.pipe(m2)
 
-  const [mistralResponse, cohereResponse] = await Promise.all([
-    solutionPrompt.pipe(m1).invoke({ problem }),
-    solutionPrompt.pipe(m2).invoke({ problem }),
-  ]);
+  // ── Step 1: Both contestants stream concurrently ───────────────────────────
+  onEvent({ type: 'contestant_1_start' })
+  onEvent({ type: 'contestant_2_start' })
 
-  const solution_1 = typeof mistralResponse.content === "string"
-    ? mistralResponse.content
-    : JSON.stringify(mistralResponse.content);
+  const [c1Result, c2Result] = await Promise.all([
+    runContestantStream(c1Chain, problem, model1Id, 'contestant_1_token', 'contestant_1_done', onEvent),
+    runContestantStream(c2Chain, problem, model2Id, 'contestant_2_token', 'contestant_2_done', onEvent),
+  ])
 
-  const solution_2 = typeof cohereResponse.content === "string"
-    ? cohereResponse.content
-    : JSON.stringify(cohereResponse.content);
+  const solution_1 = c1Result.text
+  const solution_2 = c2Result.text
 
-  // Step 2: Judge evaluates both solutions
-  const structuredJudge = (jModel as any).withStructuredOutput(judgeSchema);
+  // ── Step 2: Judge runs immediately after both contestants finish ────────────
+  const judgeStart = Date.now()
+  onEvent({ type: 'judge_start' })
 
-  const judgePrompt = ChatPromptTemplate.fromMessages([
-    [
-      "system",
-      `You are an expert AI judge. You evaluate two AI-generated solutions to a given problem.
-Score each solution out of 10 based on correctness, clarity, completeness, and quality.
-Make sure the two scores are DIFFERENT. Declare a clear winner.
-Be concise but insightful in your reasoning.`,
-    ],
-    [
-      "human",
-      `Problem: {problem}
+  const structuredJudge = (jModel as any).withStructuredOutput(judgeSchema)
+  const judgeChain      = judgePromptTemplate.pipe(structuredJudge)
 
-Solution 1 (generated by ${model1Name}):
-{solution_1}
-
-Solution 2 (generated by ${model2Name}):
-{solution_2}
-
-Please evaluate both solutions, score them, and provide specific reasoning. State strengths and critiques for each model by name in your reasoning.`,
-    ],
-  ]);
-
-  const chain = judgePrompt.pipe(structuredJudge);
-
-  const judgeResponse = (await chain.invoke({
+  const judgeResponse = (await judgeChain.invoke({
     problem,
+    model1Name,
+    model2Name,
     solution_1,
     solution_2,
-  })) as JudgeResult;
+  })) as JudgeResult
 
-  return {
+  const judgeElapsed = Date.now() - judgeStart
+  onEvent({ type: 'judge_done', elapsedMs: judgeElapsed })
+
+  const totalElapsed = Date.now() - battleStart
+
+  const result: BattleResult = {
     problem,
     solution_1,
     solution_2,
@@ -120,5 +224,14 @@ Please evaluate both solutions, score them, and provide specific reasoning. Stat
     model2: model2Id,
     judgeModel: judgeModelId,
     judge: judgeResponse,
-  };
+    timings: {
+      total:       totalElapsed,
+      contestant1: c1Result.elapsedMs,
+      contestant2: c2Result.elapsedMs,
+      judge:       judgeElapsed,
+    },
+  }
+
+  onEvent({ type: 'complete', data: result, elapsedMs: totalElapsed })
+  return result
 }

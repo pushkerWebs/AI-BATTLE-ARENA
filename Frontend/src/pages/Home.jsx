@@ -502,19 +502,18 @@ const ModelSelectors = React.memo(({
       {/* Model 1 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <label style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, color: C.onSurfVar, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Model 1 (Contestant)</label>
-        <select value={model1} onChange={e => setModel1(e.target.value)} style={{ background: C.surfLow, color: C.onSurf, border: `1px solid ${C.outlineV}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, fontFamily: "'Geist Pixel', monospace", outline: 'none', cursor: 'pointer' }}>
+        <select value={model1} onChange={e => setModel1(e.target.value)} style={{ width: '100%', background: C.surfLow, color: C.onSurf, border: `1px solid ${C.outlineV}`, borderRadius: 8, padding: '10px 14px', paddingRight: '36px', fontSize: 13, fontFamily: "'Geist Pixel', monospace", outline: 'none', cursor: 'pointer' }}>
           <optgroup label="Mistral AI">
-            <option value="mistral-medium-latest">Mistral Medium</option>
-            <option value="mistral-large-latest">Mistral Large</option>
-            <option value="open-mixtral-8x22b">Mixtral 8x22B</option>
-            <option value="mistral-small-latest">Mistral Small</option>
+            <option value="mistral-medium-latest">⚖️ Mistral Medium — Balanced</option>
+            <option value="mistral-large-latest">🧠 Mistral Large — High Quality · Slower</option>
+            <option value="mistral-small-latest">⚡ Mistral Small — Fast</option>
           </optgroup>
           <optgroup label="Cohere">
-            <option value="command-a-03-2025">Command A (Latest)</option>
-            <option value="command-r-08-2024">Command R</option>
+            <option value="command-a-03-2025">⚖️ Cohere Command A — Balanced</option>
+            <option value="command-r-08-2024">⚖️ Cohere Command R — Balanced</option>
           </optgroup>
           <optgroup label="Google Gemini">
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+            <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash — Fast</option>
           </optgroup>
         </select>
       </div>
@@ -522,19 +521,18 @@ const ModelSelectors = React.memo(({
       {/* Model 2 */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <label style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, color: C.onSurfVar, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Model 2 (Contestant)</label>
-        <select value={model2} onChange={e => setModel2(e.target.value)} style={{ background: C.surfLow, color: C.onSurf, border: `1px solid ${C.outlineV}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, fontFamily: "'Geist Pixel', monospace", outline: 'none', cursor: 'pointer' }}>
+        <select value={model2} onChange={e => setModel2(e.target.value)} style={{ width: '100%', background: C.surfLow, color: C.onSurf, border: `1px solid ${C.outlineV}`, borderRadius: 8, padding: '10px 14px', paddingRight: '36px', fontSize: 13, fontFamily: "'Geist Pixel', monospace", outline: 'none', cursor: 'pointer' }}>
           <optgroup label="Cohere">
-            <option value="command-a-03-2025">Command A (Latest)</option>
-            <option value="command-r-08-2024">Command R</option>
+            <option value="command-a-03-2025">⚖️ Cohere Command A — Balanced</option>
+            <option value="command-r-08-2024">⚖️ Cohere Command R — Balanced</option>
           </optgroup>
           <optgroup label="Mistral AI">
-            <option value="mistral-medium-latest">Mistral Medium</option>
-            <option value="mistral-large-latest">Mistral Large</option>
-            <option value="open-mixtral-8x22b">Mixtral 8x22B</option>
-            <option value="mistral-small-latest">Mistral Small</option>
+            <option value="mistral-medium-latest">⚖️ Mistral Medium — Balanced</option>
+            <option value="mistral-large-latest">🧠 Mistral Large — High Quality · Slower</option>
+            <option value="mistral-small-latest">⚡ Mistral Small — Fast</option>
           </optgroup>
           <optgroup label="Google Gemini">
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+            <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash — Fast</option>
           </optgroup>
         </select>
       </div>
@@ -542,19 +540,18 @@ const ModelSelectors = React.memo(({
       {/* Judge */}
       <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
         <label style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, color: C.onSurfVar, textTransform: 'uppercase', letterSpacing: '0.05em' }}>Evaluation Judge</label>
-        <select value={judgeModel} onChange={e => setJudgeModel(e.target.value)} style={{ background: C.surfLow, color: C.onSurf, border: `1px solid ${C.outlineV}`, borderRadius: 8, padding: '10px 14px', fontSize: 13, fontFamily: "'Geist Pixel', monospace", outline: 'none', cursor: 'pointer' }}>
+        <select value={judgeModel} onChange={e => setJudgeModel(e.target.value)} style={{ width: '100%', background: C.surfLow, color: C.onSurf, border: `1px solid ${C.outlineV}`, borderRadius: 8, padding: '10px 14px', paddingRight: '36px', fontSize: 13, fontFamily: "'Geist Pixel', monospace", outline: 'none', cursor: 'pointer' }}>
           <optgroup label="Google Gemini">
-            <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+            <option value="gemini-2.5-flash">⚡ Gemini 2.5 Flash — Fast</option>
           </optgroup>
           <optgroup label="Mistral AI">
-            <option value="mistral-large-latest">Mistral Large</option>
-            <option value="mistral-medium-latest">Mistral Medium</option>
-            <option value="open-mixtral-8x22b">Mixtral 8x22B</option>
-            <option value="mistral-small-latest">Mistral Small</option>
+            <option value="mistral-large-latest">🧠 Mistral Large — High Quality · Slower</option>
+            <option value="mistral-medium-latest">⚖️ Mistral Medium — Balanced</option>
+            <option value="mistral-small-latest">⚡ Mistral Small — Fast</option>
           </optgroup>
           <optgroup label="Cohere">
-            <option value="command-a-03-2025">Command A (Latest)</option>
-            <option value="command-r-08-2024">Command R</option>
+            <option value="command-a-03-2025">⚖️ Cohere Command A — Balanced</option>
+            <option value="command-r-08-2024">⚖️ Cohere Command R — Balanced</option>
           </optgroup>
         </select>
       </div>

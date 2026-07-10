@@ -1,4 +1,3 @@
-import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import App from './App.jsx'
 
@@ -10,8 +9,10 @@ if ('scrollRestoration' in history) {
   history.scrollRestoration = 'manual'
 }
 
+// NOTE: React StrictMode intentionally double-invokes useEffect in development
+// to detect side effects. This caused two POST /battle/stream requests per battle
+// (mount → cleanup → remount), resulting in the doubled 'Battle started' backend logs
+// and occasional duplicate API calls to Mistral/Cohere. Removed here.
 createRoot(document.getElementById('root')).render(
-  <StrictMode>
-    <App />
-  </StrictMode>,
+  <App />,
 )

@@ -394,6 +394,9 @@ body {
 .anim-glow    { animation: glow-pulse 3s ease-in-out infinite; }
 .anim-float   { animation: float-y 3.5s ease-in-out infinite; }
 
+@keyframes spin-slow-kf { to { transform: rotate(360deg); } }
+.spin-slow { animation: spin-slow-kf 3s linear infinite; }
+
 @keyframes hammer-swing {
   0%, 100% { transform: rotate(-5deg); }
   50% { transform: rotate(18deg); }
@@ -582,7 +585,21 @@ body {
 /* ─── Responsive: Comparing step cards ───────────────────── */
 .comparing-step-container {
   width: 100%;
-  max-width: min(460px, 90vw);
+  max-width: min(1100px, 95vw);
+}
+
+.comparing-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  width: 100%;
+}
+
+@media (max-width: 640px) {
+  .comparing-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
 }
 
 /* ─── Responsive: Verdict header padding ─────────────────── */
