@@ -185,7 +185,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
       </div>
 
       {/* Main area */}
-      <div data-lenis-prevent style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column' }}>
+      <div data-lenis-prevent style={{ flex: 1, height: '100vh', overflowY: 'auto', position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', minWidth: 0 }}>
 
         <motion.header
           initial={{ y: -16, opacity: 0 }}
@@ -263,15 +263,15 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
             style={{ padding: 24, borderRadius: 12, display: 'flex', flexDirection: 'column', gap: 16, '--mx': `${coords1.x}px`, '--my': `${coords1.y}px` }}
             onMouseMove={(e) => handleMouseMove(e, 1)}
           >
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: 16 }}>
+            <div className="verdict-meta-container">
               <div>
                 <h3 style={{ fontFamily: "'Helvetica', Arial, sans-serif", fontSize: 24, fontWeight: 600, letterSpacing: '-0.02em', margin: '4px 0 0', color: C.primary }}>
                   System Architecture Evaluation
                 </h3>
               </div>
-              <div style={{ textAlign: 'right' }}>
+              <div className="verdict-meta-right">
                 <p style={{ fontFamily: "'Helvetica', Arial, sans-serif", fontSize: 12, color: C.onSurfVar, margin: 0 }}>Executed Live • Optimal Node</p>
-                <div style={{ display: 'flex', gap: 8, marginTop: 8, justifyContent: 'flex-end' }}>
+                <div className="verdict-meta-badges">
                   {[model1Name, model2Name].map(n => (
                     <span key={n} style={{ padding: '2px 8px', background: C.surfHigh2, border: `1px solid ${C.outlineV}40`, borderRadius: 4, fontSize: 10, fontFamily: "'Geist Pixel', monospace", textTransform: 'uppercase' }}>{n}</span>
                   ))}
@@ -318,7 +318,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.18, ease }}
                 className={`glass-panel ${winnerIsS1 ? 'winner-card' : ''}`}
-                style={{ borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', '--mx': `${coords2.x}px`, '--my': `${coords2.y}px` }}
+                style={{ borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', minWidth: 0, '--mx': `${coords2.x}px`, '--my': `${coords2.y}px` }}
                 onMouseMove={(e) => handleMouseMove(e, 2)}
               >
                 {winnerIsS1 && (
@@ -350,8 +350,8 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
                     </button>
                   </div>
                 </div>
-                <div style={{ background: C.codeBg, padding: 20, flex: 1, position: 'relative', overflow: 'hidden' }}>
-                  <div className="markdown-body" data-lenis-prevent style={{ maxHeight: expandedSolution === 'solution_1' ? 'calc(100vh - 280px)' : 600, overflowY: 'auto', paddingBottom: 40, scrollbarWidth: 'thin' }}>
+                 <div style={{ background: C.codeBg, padding: 20, flex: 1, position: 'relative', overflow: 'hidden', minWidth: 0 }}>
+                  <div className="markdown-body" data-lenis-prevent style={{ maxHeight: expandedSolution === 'solution_1' ? 'calc(100vh - 280px)' : 600, overflowY: 'auto', paddingBottom: 40, scrollbarWidth: 'thin', minWidth: 0 }}>
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{solution_1}</ReactMarkdown>
                   </div>
                   <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: `linear-gradient(to top, ${C.codeBg}, transparent)`, pointerEvents: 'none' }} />
@@ -366,7 +366,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ duration: 0.5, delay: 0.22, ease }}
                 className={`glass-panel ${!winnerIsS1 ? 'winner-card' : ''}`}
-                style={{ borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', '--mx': `${coords2.x}px`, '--my': `${coords2.y}px` }}
+                style={{ borderRadius: 12, overflow: 'hidden', display: 'flex', flexDirection: 'column', minWidth: 0, '--mx': `${coords2.x}px`, '--my': `${coords2.y}px` }}
                 onMouseMove={(e) => handleMouseMove(e, 2)}
               >
                 {!winnerIsS1 && (
@@ -398,8 +398,8 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
                     </button>
                   </div>
                 </div>
-                <div style={{ background: C.codeBg, padding: 20, flex: 1, position: 'relative', overflow: 'hidden' }}>
-                  <div className="markdown-body" data-lenis-prevent style={{ maxHeight: expandedSolution === 'solution_2' ? 'calc(100vh - 280px)' : 600, overflowY: 'auto', paddingBottom: 40, scrollbarWidth: 'thin' }}>
+                 <div style={{ background: C.codeBg, padding: 20, flex: 1, position: 'relative', overflow: 'hidden', minWidth: 0 }}>
+                  <div className="markdown-body" data-lenis-prevent style={{ maxHeight: expandedSolution === 'solution_2' ? 'calc(100vh - 280px)' : 600, overflowY: 'auto', paddingBottom: 40, scrollbarWidth: 'thin', minWidth: 0 }}>
                     <ReactMarkdown remarkPlugins={[remarkGfm]}>{solution_2}</ReactMarkdown>
                   </div>
                   <div style={{ position: 'absolute', bottom: 0, left: 0, right: 0, height: 60, background: `linear-gradient(to top, ${C.codeBg}, transparent)`, pointerEvents: 'none' }} />
@@ -416,8 +416,8 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
             style={{ display: 'flex', justifyContent: 'center', margin: '8px 0' }}
           >
             <div style={{ display: 'inline-flex', padding: 1, borderRadius: 9999, background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.25), transparent)' }}>
-              <div style={{ background: C.bg, padding: '12px 48px', borderRadius: 9999 }}>
-                <span style={{ fontFamily: "var(--font-pixel)", fontSize: 20, fontWeight: 700, letterSpacing: '0.06em', color: C.primary, textTransform: 'uppercase' }}>
+              <div className="verdict-winner-banner" style={{ background: C.bg }}>
+                <span className="verdict-winner-text" style={{ color: C.primary }}>
                   🏆 Winner: {winnerModel} Wins
                 </span>
               </div>
@@ -428,22 +428,22 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
           <motion.section
             {...fadeUp(0.35, shouldReduceMotion)}
             className="verdict-score-row"
-            style={{ display: 'grid', gridTemplateColumns: '1fr auto 1fr', gap: 24, alignItems: 'center' }}
           >
             {/* Score 1 */}
             <motion.div
               initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: -12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.38, ease }}
-              className="glass-panel"
-              style={{ padding: 24, borderRadius: 12 }}
+              className="glass-panel verdict-score-card"
+              style={{ borderRadius: 12 }}
             >
-              <span style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, letterSpacing: '0.02em', color: C.outline, textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Solution 1 Score</span>
+              <span className="verdict-score-title" style={{ fontFamily: "'Geist Pixel', monospace", letterSpacing: '0.02em', color: C.outline, textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Solution 1 Score</span>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.55 }}
-                style={{ fontSize: 44, fontWeight: 700, color: C.primary, marginBottom: 12 }}
+                className="verdict-score-num"
+                style={{ fontWeight: 700, color: C.primary, marginBottom: 12 }}
               >
                 {score1}<span style={{ fontSize: 20, color: C.onSurfVar }}>/10</span>
               </motion.div>
@@ -476,15 +476,16 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
               initial={shouldReduceMotion ? { opacity: 1, x: 0 } : { opacity: 0, x: 12 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.5, delay: 0.38, ease }}
-              className="glass-panel"
-              style={{ padding: 24, borderRadius: 12 }}
+              className="glass-panel verdict-score-card"
+              style={{ borderRadius: 12 }}
             >
-              <span style={{ fontFamily: "'Geist Pixel', monospace", fontSize: 11, letterSpacing: '0.02em', color: C.outline, textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Solution 2 Score</span>
+              <span className="verdict-score-title" style={{ fontFamily: "'Geist Pixel', monospace", letterSpacing: '0.02em', color: C.outline, textTransform: 'uppercase', display: 'block', marginBottom: 8 }}>Solution 2 Score</span>
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.55 }}
-                style={{ fontSize: 44, fontWeight: 700, color: C.primary, marginBottom: 12 }}
+                className="verdict-score-num"
+                style={{ fontWeight: 700, color: C.primary, marginBottom: 12 }}
               >
                 {score2}<span style={{ fontSize: 20, color: C.onSurfVar }}>/10</span>
               </motion.div>
@@ -502,7 +503,7 @@ export default function Verdict({ result, onNew, onNavigate, onSelectBattle }) {
               <h5 style={{ display: 'flex', alignItems: 'center', gap: 8, fontSize: 16, fontWeight: 500, margin: 0, color: C.primary }}>
                 <Icon n="analytics" size={18} /> Reasoning Analysis
               </h5>
-              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(160px, 1fr))', gap: 16 }}>
+              <div className="verdict-reasoning-grid">
                 {[
                   { icon: 'info', color: C.onSurfVar, label: `${model1Name.toUpperCase()} CRITIQUE`, text: judge.solution_1_reasoning ?? 'The output provides a solid initial architecture, but lacks detailed refresh token rotation logic, potentially creating session vulnerability.', delay: 0.5 },
                   { icon: 'verified', color: C.primary, label: `${model2Name.toUpperCase()} STRENGTHS`, text: judge.solution_2_reasoning ?? 'Excellent structural modularity and repository separation. Directly tackles security tokens with explicit rotation and audit logging.', delay: 0.58 },
